@@ -12,6 +12,9 @@ const libFS = require('fs');
 const Chai = require("chai");
 const Expect = Chai.expect;
 
+// If you set this to false, the tests won't clean up their data so you can inspect it.
+const _CLEAN_UP_TEST_DATA = true;
+
 suite
 (
 	'Bibliograph',
@@ -49,7 +52,7 @@ suite
 							(pError)=>
 							{
 								Expect(libFS.existsSync(`${__dirname}/../debug/data/TestStorage`)).to.be.equal(true, 'The storage folder should exist.');
-								libFS.rmSync(`${__dirname}/../debug/data/TestStorage`, {recursive: true});
+								if (_CLEAN_UP_TEST_DATA) { libFS.rmSync(`${__dirname}/../debug/data/TestStorage`, {recursive: true}); }
 								fNext();
 							}
 						);
@@ -108,7 +111,7 @@ suite
 								_Pict.BibliographStorage.createSourceFolder('TestSource',
 									(pError)=>
 									{
-										libFS.rmSync(`${__dirname}/../debug/data/TestStorage`, {recursive: true});
+										if (_CLEAN_UP_TEST_DATA) { libFS.rmSync(`${__dirname}/../debug/data/TestStorage`, {recursive: true}); }
 										fCallback();
 									}
 								);
@@ -182,7 +185,7 @@ suite
 						_Anticipate.anticipate(
 							function (fCallback)
 							{
-								_Pict.Bibliograph.readMetadata('UnitTestManual', 'A',
+								_Pict.Bibliograph.readRecordMetadata('UnitTestManual', 'A',
 									function(pError, pRecordMetadata)
 									{
 										Expect(pRecordMetadata.MD5).to.equal('461d65fea865254459a3c57f2f554ccf', 'The record md5 should be correct.');
@@ -195,7 +198,7 @@ suite
 						_Anticipate.anticipate(
 							function (fCallback)
 							{
-								//libFS.rmSync(tmpStorageFolder, {recursive: true});
+								if (_CLEAN_UP_TEST_DATA) { libFS.rmSync(tmpStorageFolder, {recursive: true}); }
 								fCallback();
 							});
 

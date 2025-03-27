@@ -13,3 +13,17 @@ need to decompress the zip file.
 
 The data was downloaded from: (https://collegescorecard.ed.gov/data/)
 
+## Configuration
+
+You can set a default configuration for the Command-Line tool by creating
+a `.bibliograph.config.json` file in your home folder and putting the following
+contents in:
+
+```json
+{
+  "Bibliograph-Storage-FS-Path": "/Users/stevenvelozo/Code/retold/modules/meadow/bibliograph/debug/data/HarnessLib/"
+}
+```
+
+This will likely not work for you unless we share names and folder preferences
+so you will have to change the path slightly.

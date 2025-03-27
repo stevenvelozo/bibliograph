@@ -33,17 +33,7 @@ class PushComprehensionsViaIntegration extends libCLICommandLineCommand
 
 		let tmpAnticipate = this.fable.newAnticipate();
 
-		tmpAnticipate.anticipate(
-			(fCallback) =>
-			{
-				this.fable.log.info(`Preparing the command to run...`);
-				this.fable.log.info(`...initializing Bibliograph...`);
-
-				this.fable.addServiceType('Bibliograph', libBibliograph);
-				this.fable.instantiateServiceProviderIfNotExists('Bibliograph');
-
-				this.fable.Bibliograph.initialize(fCallback);
-			});
+		tmpAnticipate.anticipate(require('./CLI-Function-SetupBibliograph.js').bind(this));
 
 		tmpAnticipate.anticipate(
 			(fCallback) =>

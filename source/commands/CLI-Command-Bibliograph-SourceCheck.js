@@ -32,17 +32,7 @@ class SourceCheckCommand extends libCLICommandLineCommand
 
 		let tmpAnticipate = this.fable.newAnticipate();
 
-		tmpAnticipate.anticipate(
-			(fNext) =>
-			{
-				this.fable.log.info(`Preparing the command to run...`);
-				this.fable.log.info(`...initializing Bibliograph...`);
-
-				this.fable.addServiceType('Bibliograph', libBibliograph);
-				this.fable.instantiateServiceProviderIfNotExists('Bibliograph');
-
-				this.fable.Bibliograph.initialize(fNext);
-			});
+		tmpAnticipate.anticipate(require('./CLI-Function-SetupBibliograph.js').bind(this));
 
 		tmpAnticipate.anticipate(
 			(fNext) =>

@@ -1,0 +1,12 @@
+[
+	{ "School": "University of Oregon", "Size": 12 },
+	{ "School": "University of Washington", "Size": 12 },
+	{ "School": "University of California, Berkeley", "Size": 11 },
+	{ "School": "University of California, Los Angeles", "Size": 12 },
+	{ "School": "University of California, San Diego", "Size": 12 },
+	{ "School": "University of California, Irvine", "Size": 12 },
+	{ "School": "University of California, Santa Barbara", "Size": 12 },
+	{ "School": "University of California, Davis", "Size": 12 },
+	{ "School": "University of California, Riverside", "Size": 12 },
+	{ "School": "University of California, Merced", "Size": 12 }
+]

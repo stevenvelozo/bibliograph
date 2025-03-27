@@ -19,7 +19,7 @@ const _ProgramPictSettings = (
 		// This is the `fable-log` logstreams configuration.
 		LogStreams:
 			[
-				/* Uncomment this stanza to log to a new file each time a command is run
+				/* Uncomment this stanza to log to a new file each time a command is run *
 				{
 					loggertype:'simpleflatfile',
 					outputloglinestoconsole: false,
@@ -28,10 +28,9 @@ const _ProgramPictSettings = (
 					level:'trace',
 					path: `${process.cwd()}/Bibliograph-CLI-Run-${libCLIProgram.generateFileNameDateStamp()}.log`
 				},
-				 */
+				/* */
 
-				/* Uncomment this stanza to log to a unified file each time a command is run
-				 */
+				/* Uncomment this stanza to log to a unified file each time a command is run */
 				{
 					loggertype:'simpleflatfile',
 					outputloglinestoconsole: false,
@@ -40,6 +39,7 @@ const _ProgramPictSettings = (
 					level:'trace',
 					path: `${process.cwd()}/Bibliograph-CLI-Run-Unified.log`
 				},
+				/* */
 
 				{
 					loggertype:'console',
@@ -49,10 +49,9 @@ const _ProgramPictSettings = (
 				}
 			],
 
-		ProgramOptionsFileName: '.bibliograph.config.json',
-
-		AutoGatherProgramOptions: true,
+		ProgramConfigurationFileName: '.bibliograph.config.json',
 		AutoAddConfigurationExplanationCommand: true,
+		AutoGatherProgramConfiguration: true,
 
 		DefaultProgramOptions:
 			{
@@ -64,6 +63,9 @@ const _ProgramPictSettings = (
 
 let _Program = new libCLIProgram(_ProgramPictSettings,
 	[
+		require('./commands/CLI-Command-Bibliograph-Read.js'),
+		require('./commands/CLI-Command-Bibliograph-Write.js'),
+		require('./commands/CLI-Command-Bibliograph-Delete.js'),
 		require('./commands/CLI-Command-Bibliograph-SourceCreate.js'),
 		require('./commands/CLI-Command-Bibliograph-SourceCheck.js')
 	]);

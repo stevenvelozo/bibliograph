@@ -1,3 +1,4 @@
 # Bibliograph Raw Record Filing and Styling
 
-Storing raw data for better ingestion pipelines.
+This library stores raw data for better ingestion pipelines.  Meant to make
+record-level change tracking easier to understand.
