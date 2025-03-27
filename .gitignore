@@ -1,3 +1,18 @@
+package-lock.json
+
+# Test Environment
+debug/testenv
+
+# Quackage takes care of these for me!
+.babelrc
+.browserslistrc
+.browserslistrc-BACKUP
+.gulpfile-quackage.js
+.gulpfile-quackage-config.json
+
+# I just dislike this one.
+.DS_Store
+
 # Logs
 logs
 *.log
@@ -103,12 +118,6 @@ dist
 # vuepress v2.x temp and cache directory
 .temp
 .cache
-
-# vitepress build output
-**/.vitepress/dist
-
-# vitepress cache directory
-**/.vitepress/cache
 
 # Docusaurus cache and generated files
 .docusaurus
