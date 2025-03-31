@@ -14,7 +14,6 @@ class BibliographStorageFS extends libBibliographStorageBase
 		this.Initialized = false;
 	}
 
-
 	/**
 	 * Initializes the Bibliograph FS Storage
 	 * 

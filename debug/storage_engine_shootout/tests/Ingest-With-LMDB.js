@@ -1,0 +1,1 @@
+console.log(JSON.stringify({This:'Bibliograph-Storage-LMDB.js', That:'Bibliograph-Storage-FS.js'}));

@@ -25,8 +25,7 @@ class RecordDeleteCommand extends libCLICommandLineCommand
 	/**
 	 * Delete a record.
 	 * 
-	 * @param {function} fCallback
-	 * 
+	 * @param {function} fCallback - a Callback function to call when the command is complete
 	 * @returns void
 	 */
 	deleteRecord(fCallback)

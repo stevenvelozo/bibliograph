@@ -1,0 +1,14 @@
+{
+  "name": "storage_engine_shootout",
+  "version": "1.0.0",
+  "description": "Bibliograph Storage Engine Test Fixture",
+  "main": "Ingest-Test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lmdb": "^3.2.6"
+  }
+}

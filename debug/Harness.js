@@ -1,4 +1,4 @@
-//const tmpIntegrationRun = require("Ingest-DOE-Data.js");
+const tmpIntegrationRun = require("./Ingest-DOE-Data.js");
 
 //////////////////////////////////////////////////////////////////////////////
 //  _______  _       _________
@@ -29,5 +29,5 @@ let libCLIService = require('../source/CLI-Program-Bibliograph.js');
 
 //libCLIService.run(['node', 'Harness.js', 'source_create', 'SchoolData']);
 //libCLIService.run(['node', 'Harness.js', 'write', '-s', 'SchoolData', '-i', 'input/Schoools.json', '-g', '{~D:Record.School~}']);
-libCLIService.run(['node', 'Harness.js', 'write', '-s', 'SchoolData', '-i', 'input/Schoools.json']);
+//libCLIService.run(['node', 'Harness.js', 'write', '-s', 'SchoolData', '-i', 'input/Schoools.json']);
 

@@ -1,0 +1,1 @@
+console.log(JSON.stringify({Some:'thing'}));

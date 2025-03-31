@@ -8,12 +8,22 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Launch Program",
+			"name": "Launch Debug Harness",
 			"cwd": "${workspaceFolder}/debug/",
 			"skipFiles": [
 				"<node_internals>/**"
 			],
 			"program": "${workspaceFolder}/debug/Harness.js"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Run Performance Suite (requires other services)",
+			"cwd": "${workspaceFolder}/debug/storage_engine_shootout/",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"program": "${workspaceFolder}/debug/storage_engine_shootout/RunTests.js"
 		}
 	]
 }
