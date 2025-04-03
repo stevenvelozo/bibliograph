@@ -109,6 +109,18 @@ class BibliographServiceStorageBase extends libPictProvider
 	}
 
 	/**
+	 * Reads the record keys from the specified source hash.
+	 *
+	 * @param {Object} pSourceHash - The source hash containing the data to read keys from.
+	 * @param {Function} fCallback - The callback function to execute after reading the keys.
+	 * @returns {void} The result is passed to the callback function.
+	 */
+	readRecordKeys(pSourceHash, fCallback)
+	{
+		return fCallback(null, []);
+	}
+
+	/**
 	 * Reads a record from the storage based on the provided source hash and record GUID.
 	 *
 	 * The callback takes two arguments: an error (if any) and the result.

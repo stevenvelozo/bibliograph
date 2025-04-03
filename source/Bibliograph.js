@@ -90,6 +90,15 @@ class BibliographService extends libFableServiceBase
 		this.fable.BibliographStorage.checkSourceExists(pSourceHash, fCallback);
 	}
 
+	readRecordKeys(pSourceHash, fCallback)
+	{
+		if ((typeof(pSourceHash) != 'string') || (pSourceHash.length < 1))
+		{
+			return fCallback(new Error('The source hash must be a string with data in it.'));
+		}
+		this.fable.BibliographStorage.readRecordKeys(pSourceHash, fCallback);
+	}
+
 	/**
 	 * Reads a record from the Bibliograph storage.
 	 *

@@ -173,6 +173,21 @@ suite
 						_Anticipate.anticipate(
 							function (fCallback)
 							{
+								_Pict.Bibliograph.readRecordKeys('UnitTestManual',
+									function(pError, pRecordKeys)
+									{
+										Expect(pRecordKeys).to.be.an('array', 'The record keys should be an array.');
+										Expect(pRecordKeys.length).to.be.equal(3, 'There should be three records.');
+										Expect(pRecordKeys[0]).to.be.equal('A', 'The first record key should be A.');
+										Expect(pRecordKeys[1]).to.be.equal('B', 'The second record key should be B.');
+										Expect(pRecordKeys[2]).to.be.equal('C', 'The third record key should be C.');
+										return fCallback(pError);
+									});
+							});
+
+						_Anticipate.anticipate(
+							function (fCallback)
+							{
 								// Try to read something that doesn't exist.
 								_Pict.Bibliograph.read('UnitTestManual', 'D',
 									function(pError, pRecord)

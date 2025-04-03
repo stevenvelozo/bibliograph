@@ -364,6 +364,42 @@ class BibliographStorageFS extends libBibliographStorageBase
 	}
 
 	/**
+	 * Reads the record keys from the file system for a specific source hash.
+	 * 
+	 * @param {string} pSourceHash - The hash representing the source whose record keys are to be read.
+	 * @param {function(Error|null, string[]|null): void} fCallback - The callback function to handle the result.
+	 * @throws {Error} If the storage is not initialized.
+	 */
+	readRecordKeys(pSourceHash, fCallback)
+	{
+		if (!this.Initialized)
+		{
+			return fCallback(new Error(`Bibliograph FS Storage not initialized; read of record keys [${pSourceHash}] failed.`));
+		}
+
+		libFS.readdir(this.getSourceRecordFolderPath(pSourceHash), function(pError, pFiles)
+		{
+			if (pError)
+			{
+				return fCallback(pError);
+			}
+
+			let tmpKeys = [];
+			for (let i = 0; i < pFiles.length; i++)
+			{
+				// If it isn't a JSON file, skip it.
+				if (pFiles[i].indexOf('.json') === -1)
+				{
+					continue;
+				}
+				tmpKeys.push(pFiles[i].replace('.json', ''));
+			}
+
+			return fCallback(null, tmpKeys);
+		});
+	}
+
+	/**
 	 * Reads a record from the file system storage.
 	 *
 	 * @param {string} pSourceHash - The hash of the source to identify the storage location.
