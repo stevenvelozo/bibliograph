@@ -1,0 +1,12 @@
+{
+	"Scope": "FruityVice-Raw",
+	"Descriptors":
+	{
+
+	},
+	"Bibliograph":
+	{
+		"SourceFormat": "JSON",
+		"GUIDTemplate": "{~D:Record.School~}"
+	}
+}

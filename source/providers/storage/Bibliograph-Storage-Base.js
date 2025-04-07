@@ -96,6 +96,73 @@ class BibliographServiceStorageBase extends libPictProvider
 		return fCallback(null);
 	}
 
+	generateDeltaContainer(pRecordGUID)
+	{
+		return (
+			{
+				RecordGUID: pRecordGUID,
+				Deltas: []
+			});
+	}
+
+	readRecordDelta(pSourceHash, pRecordGUID, fCallback)
+	{
+		return fCallback(null, this.generateDeltaContainer(pRecordGUID));
+	}
+
+	persistRecordDelta(pSourceHash, pMetadata, pDelta, fCallback)
+	{
+		// Off to /dev/null as with everything else in this base class
+		return fCallback(null);
+	}
+
+	writeRecordDelta(pSourceHash, pRecordMetadata, pDelta, fCallback)
+	{
+		let tmpAnticipate = this.fable.newAnticipate();
+		let tmpRecordDeltaContainer = this.generateDeltaContainer(pRecordMetadata.GUID);
+
+		// Get the delta (or create a new one)
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				this.readRecordDelta(pSourceHash, pRecordMetadata.GUID,
+					function (pReadDeltaError, pRecordDeltaContainer)
+					{
+						if (pReadDeltaError)
+						{
+							this.log.warn(`Error reading existing delta for record [${pSourceHash}]:[${pRecordMetadata.GUID}]: ${pReadDeltaError}`);
+						}
+
+						if ((typeof(pRecordDeltaContainer) === 'object') && (pRecordDeltaContainer !== null))
+						{
+							tmpRecordDeltaContainer = pRecordDeltaContainer;
+						}
+						return fNext();
+					}.bind(this))
+			}.bind(this));
+
+		// Now push the current Delta
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				tmpRecordDeltaContainer.Deltas.push(
+					{
+						Delta: pDelta,
+						Ingest: pRecordMetadata.Ingest || +new Date(),
+					});
+				return fNext();
+			}.bind(this));
+
+		// Now persist the delta
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				this.persistRecordDelta(pSourceHash, pRecordMetadata, tmpRecordDeltaContainer, fNext);
+			}.bind(this));
+
+		return fCallback(null);
+	}
+
 	/**
 	 * Checks if a record exists in the storage.
 	 *
@@ -103,7 +170,7 @@ class BibliographServiceStorageBase extends libPictProvider
 	 * @param {string} pRecordGUID - The unique identifier of the record to check for existence.
 	 * @param {Function} fCallback - The callback function to execute after the check.
 	 */
-	checkExists(pSourceHash, pRecordGUID, fCallback)
+	exists(pSourceHash, pRecordGUID, fCallback)
 	{
 		return fCallback(null, false);
 	}
@@ -136,17 +203,150 @@ class BibliographServiceStorageBase extends libPictProvider
 		return fCallback(null, false);
 	}
 
+	persistRecord(pSourceHash, pRecordGUID, pRecordJSONString, fCallback)
+	{
+		// Off to /dev/null as with everything else in this base class
+		return fCallback(null);
+	}
+
 	/**
 	 * Writes a record to storage
 	 *
 	 * @param {string} pSourceHash - The hash of the source where the record should be stored.
 	 * @param {string} pRecordGUID - The GUID of the record to store.
-	 * @param {Object} pRecord - The record object to be written.
+	 * @param {Object} pNewPartialRecord - The (potentially partial) record object to be written.
 	 * @param {function} fCallback - A callback function to handle the result. 
 	 */
-	write(pSourceHash, pRecordGUID, pRecord, fCallback)
+	write(pSourceHash, pRecordGUID, pNewPartialRecord, fCallback)
 	{
-		return fCallback(null);
+		// Start by checking the existing metadata
+		let tmpExistingRecord = false;
+		let tmpMergedNewRecord = false;
+		let tmpRecordJSON = false;
+		let tmpNewRecordMetadata = false;
+		let tmpRecordChanged = true;
+
+		let tmpAnticipate = this.fable.newAnticipate();
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				this.read(pSourceHash, pRecordGUID,
+					function (pReadError, pExistingRecord)
+					{
+						if (pReadError)
+						{
+							this.log.warn(`Error reading record [${pSourceHash}]:[${pRecordGUID}]: ${pReadError}`);
+						}
+
+						tmpExistingRecord = pExistingRecord;
+						tmpMergedNewRecord = { ...tmpExistingRecord, ...pNewPartialRecord };
+						tmpRecordJSON = JSON.stringify(tmpMergedNewRecord);
+						tmpNewRecordMetadata = this.generateMetadataForRecord(pRecordGUID, tmpRecordJSON);
+
+						return fNext();
+					}.bind(this));
+			}.bind(this));
+
+
+
+		if (this.pict.Bibliograph.options['Bibliograph-Check-Metadata-On-Write'])
+		{
+			let tmpExistingMetadata = false;
+
+			tmpAnticipate.anticipate(
+				function (fNext)
+				{
+					this.readRecordMetadata(pSourceHash, pRecordGUID,
+						function (pReadMetadataError, pExistingMetadata)
+						{
+							if (pReadMetadataError)
+							{
+								this.log.warn(`Error reading metadata for record [${pSourceHash}]:[${pRecordGUID}]: ${pReadMetadataError}`);
+							}
+
+							tmpExistingMetadata = pExistingMetadata;
+							return fNext();
+						}.bind(this));
+				}.bind(this));
+
+			tmpAnticipate.anticipate(
+				function (fNext)
+				{
+					if (!tmpExistingMetadata)
+					{
+						// There is no existing metadata; don't worry about comparing
+						return fNext();
+					}
+					else
+					{
+						if (tmpExistingMetadata.GUID !== tmpNewRecordMetadata.GUID)
+						{
+							this.log.warn(`Record GUIDs do not match: ${tmpExistingMetadata.GUID} != ${tmpNewRecordMetadata.GUID}`);
+							// This is the only problem that throws an error -- how would this even be possible?!
+							return fNext(new Error('Record GUIDs do not match'));
+						}
+						else if (tmpExistingMetadata.Length !== tmpNewRecordMetadata.Length)
+						{
+							this.log.warn(`Record lengths do not match: ${tmpExistingMetadata.Length} != ${tmpNewRecordMetadata.Length}`);
+							return fNext();
+						}
+						else if (tmpExistingMetadata.QHash !== tmpNewRecordMetadata.QHash)
+						{
+							this.log.warn(`Record hashes do not match: ${tmpExistingMetadata.QHash} != ${tmpNewRecordMetadata.QHash}`);
+							return fNext();
+						}
+						else if (tmpExistingMetadata.MD5 !== tmpNewRecordMetadata.MD5)
+						{
+							this.log.warn(`Record hashes do not match: ${tmpExistingMetadata.MD5} != ${tmpNewRecordMetadata.MD5}`);
+							return fNext();
+						}
+
+						// The metadata is definitely the same; no need to write
+						tmpRecordChanged = false;
+						return fNext();
+					}
+				}.bind(this));
+		}
+
+		if (this.pict.Bibliograph.options['Bibliograph-Check-Metadata-On-Write'])
+		{
+			tmpAnticipate.anticipate(
+				function (fNext)
+				{
+					this.writeRecordDelta(pSourceHash, tmpNewRecordMetadata, this.pict.BibliographRecordDiff.generateDelta(tmpExistingRecord, tmpMergedNewRecord),
+						function (pWriteRecordDeltaError)
+						{
+							if (pWriteRecordDeltaError)
+							{
+								this.log.warn(`Error writing record delta [${pSourceHash}]:[${pRecordGUID}]: ${pWriteRecordDeltaError}`);
+							}
+							return fNext();
+						}.bind(this));
+				}.bind(this));
+		}
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				if (!tmpRecordChanged)
+				{
+					return fNext();
+				}
+				this.writeRecordMetadata(pSourceHash, pRecordGUID, tmpNewRecordMetadata, fNext);
+			}.bind(this));
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				if (!tmpRecordChanged)
+				{
+					return fNext();
+				}
+				this.persistRecord(pSourceHash, pRecordGUID, tmpRecordJSON, fNext);
+			}.bind(this));
+
+		tmpAnticipate.wait(fCallback);
 	}
 
 	/**
@@ -159,6 +359,7 @@ class BibliographServiceStorageBase extends libPictProvider
 	 */
 	delete(pSourceHash, pRecordGUID, fCallback)
 	{
+		// TODO: Does this go in the delta?  I think it doesn't.
 		return fCallback(null);
 	}
 }

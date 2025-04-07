@@ -57,14 +57,19 @@ const _Pict = new libPict(
 
 _Pict.AppData.Engines = (
 	[
-		{ Name: 'FS', EngineFolder: 'fs' },
-		{ Name: 'LMDB', EngineFolder: 'lmdb' },
-		{ Name: 'SQLite', EngineFolder: 'sqlite' },
-		{ Name: 'MongoDB', EngineFolder: 'mongodb' },
-		{ Name: 'MySQL', EngineFolder: 'mysql' },
-		{ Name: 'Redis', EngineFolder: 'redis' }
+		{ Name: 'Filesystem', Hash: 'FS', EngineFolder: 'fs' },
+		{ Name: 'LMDB', Hash: 'LMDB', EngineFolder: 'lmdb' },
+//		{ Name: 'SQLite', Hash: 'SQLite', EngineFolder: 'sqlite' },
+//		{ Name: 'MongoDB', Hash: 'MongoDB', EngineFolder: 'mongodb' },
+//		{ Name: 'MySQL', Hash: 'MySQL', EngineFolder: 'mysql' },
+//		{ Name: 'Redis', Hash: 'Redis', EngineFolder: 'redis' }
 	]
 )
+_Pict.AppData.Tests = (
+	[
+		{ Name: 'Simple Ingest DoE College Comparison Data', Hash: 'Ingest-DOE-Data-Simple', Manifest: false },
+		{ Name: 'GUID-Mapped Ingest DoE College Comparison Data', Hash: 'Ingest-DOE-Data', Manifest: `${__dirname}/ingest_manifests/Manyfest-RawDOE-Institutions-GUIDMapped.json` },
+	]);
 _Pict.AppData.TestResults = [];
 const _Anticipate = _Pict.newAnticipate();
 

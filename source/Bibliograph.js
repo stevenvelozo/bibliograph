@@ -35,6 +35,11 @@ class BibliographService extends libFableServiceBase
 			this.fable.addServiceTypeIfNotExists('BibliographStorage', libBibliographStorageFS);
 			this.fable.instantiateServiceProvider('BibliographStorage', this.options);
 		}
+		if (!this.fable.services.hasOwnProperty('BibliographRecordDiff'))
+		{
+			this.fable.addServiceTypeIfNotExists('BibliographRecordDiff', require('./services/record/Bibliograph-Record-Diff.js'));
+			this.fable.instantiateServiceProvider('BibliographRecordDiff', this.options);
+		}
 
 		this.fable.log.trace(`Bibliograph Service Instantiated.`);
 	}
@@ -100,6 +105,27 @@ class BibliographService extends libFableServiceBase
 	}
 
 	/**
+	 * Checks if a record exists in the bibliograph storage.
+	 *
+	 * @param {string} pSourceHash - The source hash, which must be a non-empty string.
+	 * @param {string} pRecordGUID - The record GUID, which must be a non-empty string.
+	 * @param {function(Error, boolean): void} fCallback - A callback function that is invoked with an error (if any) and a boolean indicating the existence of the record.
+	 * @throws {Error} If the source hash or record GUID is not a valid non-empty string.
+	 */
+	exists(pSourceHash, pRecordGUID, fCallback)
+	{
+		if ((typeof(pSourceHash) != 'string') || (pSourceHash.length < 1))
+		{
+			return fCallback(new Error('The source hash must be a string with data in it.'));
+		}
+		if ((typeof(pRecordGUID) != 'string') || (pRecordGUID.length < 1))
+		{
+			return fCallback(new Error('The record GUID must be a string with data in it.'));
+		}
+		this.fable.BibliographStorage.exists(pSourceHash, pRecordGUID, fCallback);
+	}
+
+	/**
 	 * Reads a record from the Bibliograph storage.
 	 *
 	 * @param {string} pSourceHash - The source hash identifying the storage location. Must be a non-empty string.
@@ -119,6 +145,19 @@ class BibliographService extends libFableServiceBase
 			return fCallback(new Error('The record GUID must be a string with data in it.'));
 		}
 		this.fable.BibliographStorage.read(pSourceHash, pRecordGUID, fCallback);
+	}
+
+	readRecordDelta(pSourceHash, pRecordGUID, fCallback)
+	{
+		if ((typeof(pSourceHash) != 'string') || (pSourceHash.length < 1))
+		{
+			return fCallback(new Error('The source hash must be a string with data in it.'));
+		}
+		if ((typeof(pRecordGUID) != 'string') || (pRecordGUID.length < 1))
+		{
+			return fCallback(new Error('The record GUID must be a string with data in it.'));
+		}
+		this.fable.BibliographStorage.readRecordDelta(pSourceHash, pRecordGUID, fCallback);
 	}
 
 	/**

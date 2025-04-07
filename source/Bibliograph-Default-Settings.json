@@ -1,3 +1,6 @@
 {
+	"Bibliograph-Check-Metadata-On-Write": true,
+	"Bibliograph-Store-Deltas": true,
+
 	"Bibliograph-Storage-FS-Path": "./data"
 }
