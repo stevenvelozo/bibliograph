@@ -371,7 +371,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 		}
 
 		let tmpRecordDeltaFileName = `__${pRecordGUID}__deltas__.json`;
-		let tmpRecordDeltaFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordDeltaFileName);
+		let tmpRecordDeltaFilePath = this.fable.FilePersistence.joinPath(this.getSourceHistoryFolderPath(pSourceHash), tmpRecordDeltaFileName);
 		let tmpRecordDeltaContainer = false;
 
 		let tmpAnticipate = this.fable.newAnticipate();

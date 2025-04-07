@@ -1,5 +1,5 @@
 const libPict = require('pict');
-const libBibliograph = require('../source/Bibliograph.js');
+const libBibliograph = require('../../source/Bibliograph.js');
 
 const libReadline = require('readline');
 const libFS = require('fs');

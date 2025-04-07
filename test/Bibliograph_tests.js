@@ -251,7 +251,6 @@ suite
 							});
 
 						// Check that records updated properly
-
 						_Anticipate.anticipate(
 							function (fCallback)
 							{

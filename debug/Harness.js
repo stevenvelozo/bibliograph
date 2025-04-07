@@ -1,4 +1,5 @@
-const tmpIntegrationRun = require("./Ingest-DOE-Data.js");
+//const tmpIntegrationRun = require("./exercises/Ingest-DOE-Data.js");
+const tmpSubsequentWrites = require("./exercises/Exercise-Subsequent-Writes.js");
 
 //////////////////////////////////////////////////////////////////////////////
 //  _______  _       _________
@@ -16,7 +17,7 @@ const tmpIntegrationRun = require("./Ingest-DOE-Data.js");
 
 // Load the cli program class directly rather than exercising the wrapping "run" script
 // NOTE: You MUST uncomment this for the subsequent command to work.
-let libCLIService = require('../source/CLI-Program-Bibliograph.js');
+//let libCLIService = require('../source/CLI-Program-Bibliograph.js');
 
 // Execute the CLI program with the provided arguments array
 // NOTE: Pick one of these at a time.
