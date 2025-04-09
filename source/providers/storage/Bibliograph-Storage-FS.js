@@ -236,8 +236,8 @@ class BibliographStorageFS extends libBibliographStorageBase
 	getRecordFileLocationData(pSourceHash, pRecordGUID)
 	{
 		let tmpRecordFileName = `${pRecordGUID}.json`;
-		let tmpRecordMetadataFileName = `__${pRecordGUID}__metadata__.json`;
-		let tmpRecordHistoryFileName = `__${pRecordGUID}__deltas__.json`;
+		let tmpRecordMetadataFileName = `_${pRecordGUID}_metadata.json`;
+		let tmpRecordHistoryFileName = `_${pRecordGUID}_deltas.json`;
 		return (
 			{
 				"RecordFileName": tmpRecordFileName,
@@ -315,7 +315,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 			return fCallback(new Error(`Bibliograph FS Storage not initialized; read of record [${pSourceHash}]:[${pRecordGUID}] metadata failed.`));
 		}
 
-		let tmpRecordMetadataFileName = `__${pRecordGUID}__metadata__.json`;
+		let tmpRecordMetadataFileName = `_${pRecordGUID}_metadata.json`;
 		let tmpRecordMetadataFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordMetadataFileName);
 		if (!this.fable.FilePersistence.existsSync(tmpRecordMetadataFilePath))
 		{
@@ -356,7 +356,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordGUID}] metadata failed.`));
 		}
 
-		let tmpRecordMetadataFileName = `__${pRecordGUID}__metadata__.json`;
+		let tmpRecordMetadataFileName = `_${pRecordGUID}_metadata.json`;
 		let tmpRecordMetadataFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordMetadataFileName);
 		let tmpRecordMetadataJSON = JSON.stringify(pMetadata);
 
@@ -370,7 +370,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 			return fCallback(new Error(`Bibliograph FS Storage not initialized; read of record [${pSourceHash}]:[${pRecordGUID}] delta failed.`));
 		}
 
-		let tmpRecordDeltaFileName = `__${pRecordGUID}__deltas__.json`;
+		let tmpRecordDeltaFileName = `_${pRecordGUID}_deltas.json`;
 		let tmpRecordDeltaFilePath = this.fable.FilePersistence.joinPath(this.getSourceHistoryFolderPath(pSourceHash), tmpRecordDeltaFileName);
 		let tmpRecordDeltaContainer = false;
 
@@ -382,9 +382,10 @@ class BibliographStorageFS extends libBibliographStorageBase
 				this.fable.FilePersistence.readFile(tmpRecordDeltaFilePath, 'utf8', 
 					function (pError, pData)
 					{
-						if (pError && pError.code !== 'ENOENT')
+						if (pError && pError.code === 'ENOENT')
 						{
-							return this.generateDeltaContainer(pRecordGUID);
+							tmpRecordDeltaContainer = this.generateDeltaContainer(pRecordGUID);
+							return fNext();
 						}
 						else if (pError)
 						{
@@ -402,7 +403,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 						}
 
 						return fNext(null);
-					});
+					}.bind(this));
 			}.bind(this));
 
 		tmpAnticipate.wait(
@@ -432,7 +433,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordMetadata.GUID}] delta failed.`));
 		}
 
-		let tmpRecordDeltaFileName = `__${pRecordMetadata.GUID}__deltas__.json`;
+		let tmpRecordDeltaFileName = `_${pRecordMetadata.GUID}_deltas.json`;
 		let tmpRecordDeltaFilePath = this.fable.FilePersistence.joinPath(this.getSourceHistoryFolderPath(pSourceHash), tmpRecordDeltaFileName);
 
 		let tmpAnticipate = this.fable.newAnticipate();

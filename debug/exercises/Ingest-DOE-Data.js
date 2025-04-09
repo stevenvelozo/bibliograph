@@ -31,7 +31,7 @@ _Pict.instantiateServiceProvider('Bibliograph', {});
 
 _Pict.settings.SourceName = 'RawDOECollegeData-2025';
 _Pict.settings.InputFileName = 'Most-Recent-Cohorts-Institution.csv';
-_Pict.settings.InputFilePath = `${__dirname}/input/${_Pict.settings.InputFileName}`;
+_Pict.settings.InputFilePath = `${__dirname}/../input/${_Pict.settings.InputFileName}`;
 
 let tmpAnticipate = _Pict.newAnticipate();
 

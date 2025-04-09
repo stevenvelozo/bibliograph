@@ -121,6 +121,11 @@ class BibliographServiceStorageBase extends libPictProvider
 		let tmpAnticipate = this.fable.newAnticipate();
 		let tmpRecordDeltaContainer = this.generateDeltaContainer(pRecordMetadata.GUID);
 
+		if (!pDelta)
+		{
+			return fCallback();
+		}
+
 		// Get the delta (or create a new one)
 		tmpAnticipate.anticipate(
 			function (fNext)
