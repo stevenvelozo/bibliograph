@@ -60,11 +60,12 @@ class BibliographServiceStorageBase extends libPictProvider
 	 */
 	generateMetadataForRecord(pRecordGUID, pRecordJSONString)
 	{
+		let tmpRecordJSONString = (typeof(pRecordJSONString) === 'string') ? pRecordJSONString : '{}';
 		let tmpMetadata = {
 			"GUID": pRecordGUID,
-			"Length": pRecordJSONString.length,
-			"QHash": this.fable.DataFormat.insecureStringHash(pRecordJSONString),
-			"MD5": libCrypto.createHash('md5').update(pRecordJSONString).digest('hex'),
+			"Length": tmpRecordJSONString.length,
+			"QHash": this.fable.DataFormat.insecureStringHash(tmpRecordJSONString),
+			"MD5": libCrypto.createHash('md5').update(tmpRecordJSONString).digest('hex'),
 			"Ingest": +new Date()
 		};
 
@@ -91,7 +92,7 @@ class BibliographServiceStorageBase extends libPictProvider
 	 * @param {Function} fCallback - The callback function to execute after writing metadata.
 	 * @returns {void}
 	 */
-	writeRecordMetadata(pSourceHash, pMetadata, fCallback)
+	persistRecordMetadata(pSourceHash, pRecordGUID, pMetadata, fCallback)
 	{
 		return fCallback(null);
 	}
@@ -192,6 +193,11 @@ class BibliographServiceStorageBase extends libPictProvider
 		return fCallback(null, []);
 	}
 
+	readRecordKeysByTimestamp(pSourceHash, pFromTimestamp, pToTimestamp, fCallback)
+	{
+		return fCallback(null, []);
+	}
+
 	/**
 	 * Reads a record from the storage based on the provided source hash and record GUID.
 	 *
@@ -209,6 +215,12 @@ class BibliographServiceStorageBase extends libPictProvider
 	}
 
 	persistRecord(pSourceHash, pRecordGUID, pRecordJSONString, fCallback)
+	{
+		// Off to /dev/null as with everything else in this base class
+		return fCallback(null);
+	}
+
+	stampRecordTimestamp(pSourceHash, pRecordGUID, fCallback)
 	{
 		// Off to /dev/null as with everything else in this base class
 		return fCallback(null);
@@ -252,8 +264,6 @@ class BibliographServiceStorageBase extends libPictProvider
 						return fNext();
 					}.bind(this));
 			}.bind(this));
-
-
 
 		if (this.pict.Bibliograph.options['Bibliograph-Check-Metadata-On-Write'])
 		{
@@ -314,7 +324,7 @@ class BibliographServiceStorageBase extends libPictProvider
 				}.bind(this));
 		}
 
-		if (this.pict.Bibliograph.options['Bibliograph-Check-Metadata-On-Write'])
+		if (this.pict.Bibliograph.options['Bibliograph-Store-Deltas'])
 		{
 			tmpAnticipate.anticipate(
 				function (fNext)
@@ -338,7 +348,7 @@ class BibliographServiceStorageBase extends libPictProvider
 				{
 					return fNext();
 				}
-				this.writeRecordMetadata(pSourceHash, pRecordGUID, tmpNewRecordMetadata, fNext);
+				this.persistRecordMetadata(pSourceHash, pRecordGUID, tmpNewRecordMetadata, fNext);
 			}.bind(this));
 
 		tmpAnticipate.anticipate(
@@ -348,10 +358,32 @@ class BibliographServiceStorageBase extends libPictProvider
 				{
 					return fNext();
 				}
-				this.persistRecord(pSourceHash, pRecordGUID, tmpRecordJSON, fNext);
+				else
+				{
+
+					tmpAnticipate.anticipate(
+						function (fPersistComplete)
+						{
+							this.persistRecord(pSourceHash, pRecordGUID, tmpRecordJSON, fPersistComplete);
+						}.bind(this));
+
+					tmpAnticipate.anticipate(
+						function (fTimeStampSetComplete)
+						{
+							this.stampRecordTimestamp(pSourceHash, pRecordGUID, fTimeStampSetComplete);
+						}.bind(this));
+				}
+
+				return fNext();
 			}.bind(this));
 
 		tmpAnticipate.wait(fCallback);
+	}
+
+	persistDelete(pSourceHash, pRecordGUID, fCallback)
+	{
+		// Off to /dev/null as with everything else in this base class
+		return fCallback(null);
 	}
 
 	/**
@@ -364,8 +396,52 @@ class BibliographServiceStorageBase extends libPictProvider
 	 */
 	delete(pSourceHash, pRecordGUID, fCallback)
 	{
-		// TODO: Does this go in the delta?  I think it doesn't.
-		return fCallback(null);
+		// Start by checking the existing metadata
+		let tmpNewRecordMetadata = false;
+		let tmpExistingMetadata = false;
+
+		let tmpAnticipate = this.fable.newAnticipate();
+
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				this.readRecordMetadata(pSourceHash, pRecordGUID,
+					function (pReadMetadataError, pExistingMetadata)
+					{
+						if (pReadMetadataError)
+						{
+							this.log.warn(`Error reading metadata for record [${pSourceHash}]:[${pRecordGUID}]: ${pReadMetadataError}`);
+						}
+
+						tmpExistingMetadata = pExistingMetadata;
+						return fNext();
+					}.bind(this));
+			}.bind(this));
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				if (!tmpExistingMetadata)
+				{
+					// There is no existing metadata; make just a deleted one.  This may mean the record doesn't exist.
+					this.generateMetadataForRecord(pRecordGUID);
+					return fNext();
+				}
+
+				tmpExistingMetadata.Deleted = +new Date();
+				tmpNewRecordMetadata = tmpExistingMetadata;
+				this.persistRecordMetadata(pSourceHash, pRecordGUID, tmpNewRecordMetadata, fNext);
+			}.bind(this));
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				this.persistDelete(pSourceHash, pRecordGUID, fNext);
+			}.bind(this));
+
+		tmpAnticipate.wait(fCallback);
+
 	}
 }
 

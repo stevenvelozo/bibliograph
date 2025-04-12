@@ -122,12 +122,15 @@ suite
 				);
 				test
 				(
-					'commit and read records',
+					'commit and read records with artificial 50ms delay to test time spans',
 					(fNext)=>
 					{
 						let _Pict = new libPict();
 						let tmpStorageFolder = `${__dirname}/../debug/data/TestStorage`;
 						_Pict.addServiceTypeIfNotExists('Bibliograph', libBibliograph);
+
+						let tmpTestBeginDate = new Date();
+						let tmpFilterFromDate = false;
 
 						_Pict.instantiateServiceProvider('Bibliograph', {"Bibliograph-Storage-FS-Path":tmpStorageFolder});
 
@@ -195,6 +198,13 @@ suite
 									}
 								);
 							});
+
+						_Anticipate.anticipate(
+							function (fCallback)
+							{
+								tmpFilterFromDate = new Date();
+								setTimeout(fCallback, 50);
+							});
 						_Anticipate.anticipate(
 							function (fCallback)
 							{
@@ -211,6 +221,35 @@ suite
 										return fCallback(pError);
 									});
 							});
+
+						_Anticipate.anticipate(
+							function (fCallback)
+							{
+								_Pict.Bibliograph.readRecordKeysByTimestamp('UnitTestManual', tmpFilterFromDate, new Date(),
+								function (pError, pRecordKeys)
+								{
+									Expect(pRecordKeys).to.be.an('array', 'The record keys should be an array.');
+									Expect(pRecordKeys.length).to.be.equal(2, 'There should be two records.');
+									Expect(pRecordKeys[0]).to.be.equal('B', 'The first record key should be B.');
+									Expect(pRecordKeys[1]).to.be.equal('C', 'The second record key should be C.');
+									return fCallback(pError);
+								});
+							});
+						_Anticipate.anticipate(
+							function (fCallback)
+							{
+								_Pict.Bibliograph.readRecordKeysByTimestamp('UnitTestManual', tmpTestBeginDate, new Date(),
+								function (pError, pRecordKeys)
+								{
+									Expect(pRecordKeys).to.be.an('array', 'The record keys should be an array.');
+									Expect(pRecordKeys.length).to.be.equal(3, 'There should be two records.');
+									Expect(pRecordKeys[0]).to.be.equal('A', 'The first record key should be A.');
+									Expect(pRecordKeys[1]).to.be.equal('B', 'The second record key should be B.');
+									Expect(pRecordKeys[2]).to.be.equal('C', 'The third record key should be C.');
+									return fCallback(pError);
+								});
+							});
+
 
 						// Exercise change tracking
 						// This changes nothing, so shouldn't result in a persist
@@ -249,8 +288,7 @@ suite
 										return fCallback(pError);
 									});
 							});
-
-						// Check that records updated properly
+						// Check that records update properly
 						_Anticipate.anticipate(
 							function (fCallback)
 							{

@@ -193,6 +193,20 @@ class BibliographStorageFS extends libBibliographStorageBase
 	}
 
 	/**
+	 * Extracts the record key from a metadata file name.
+	 * 	
+	 * This method is used to derive the record key from the metadata file name
+	 * by removing the leading underscore and the trailing "_metadata.json" suffix.
+	 * 
+	 * @param {string} pFileName - The name of the metadata file.
+	 * @returns {string} The extracted record key.
+	 */
+	getRecordKeyFromMetadataFileName(pFileName)
+	{
+		return pFileName.replace(/^_/, '').replace(/_metadata.json$/, '');
+	}
+
+	/**
 	 * Retrieves the folder path for storing source records based on the provided source hash.
 	 *
 	 * @param {string} pSourceHash - The unique hash identifying the source.
@@ -265,7 +279,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 	 */
 	sourceCreate(pSourceHash, fCallback)
 	{
-		this.fable.log.trace(`Bibliograph FS Storage Initialization: ${this.StorageFolder}`);
+		this.fable.log.trace(`Bibliograph FS Source Create [${pSourceHash}]`);
 		if (!this.Initialized)
 		{
 			this.fable.log.error(`Bibliograph FS Storage not initialized; creation of source [${pSourceHash}] failed.`);
@@ -319,7 +333,6 @@ class BibliographStorageFS extends libBibliographStorageBase
 		let tmpRecordMetadataFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordMetadataFileName);
 		if (!this.fable.FilePersistence.existsSync(tmpRecordMetadataFilePath))
 		{
-			// TODO: Generate metadata if we can?
 			return fCallback(null, false);
 		}
 
@@ -332,35 +345,10 @@ class BibliographStorageFS extends libBibliographStorageBase
 				}
 				catch(pDeserializeError)
 				{
-					this.fable.log.error(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in file [${tmpRecordMetadataFileName}] full path [${tmpRecordMetadataFilePath}]: ${pDeserializeError}`);
+					this.fable.log.error(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in Metadata file [${tmpRecordMetadataFileName}] full path [${tmpRecordMetadataFilePath}]: ${pDeserializeError}`);
 					return fCallback(pDeserializeError);
 				}
 			}.bind(this));
-	}
-
-	/**
-	 * Writes metadata for a specific record to a file in the filesystem.
-	 *
-	 * @param {string} pSourceHash - The hash of the source to which the record belongs.
-	 * @param {string} pRecordGUID - The unique identifier (GUID) of the record.
-	 * @param {Object} pMetadata - The metadata object to be written to the file.
-	 * @param {Function} fCallback - The callback function to execute after the operation.
-	 *                                It receives an error as the first argument if the operation fails.
-	 *
-	 * @throws {Error} Throws an error if the storage is not initialized.
-	 */
-	writeRecordMetadata(pSourceHash, pRecordGUID, pMetadata, fCallback)
-	{
-		if (!this.Initialized)
-		{
-			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordGUID}] metadata failed.`));
-		}
-
-		let tmpRecordMetadataFileName = `_${pRecordGUID}_metadata.json`;
-		let tmpRecordMetadataFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordMetadataFileName);
-		let tmpRecordMetadataJSON = JSON.stringify(pMetadata);
-
-		this.fable.FilePersistence.writeFile(tmpRecordMetadataFilePath, tmpRecordMetadataJSON, 'utf8', fCallback);
 	}
 
 	readRecordDelta(pSourceHash, pRecordGUID, fCallback)
@@ -398,7 +386,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 						}
 						catch(pDeserializeError)
 						{
-							this.fable.log.error(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in file [${tmpRecordDeltaFileName}] full path [${tmpRecordDeltaFilePath}]: ${pDeserializeError}`);
+							this.fable.log.error(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in Delta file [${tmpRecordDeltaFileName}] full path [${tmpRecordDeltaFilePath}]: ${pDeserializeError}`);
 							return fNext(pDeserializeError);
 						}
 
@@ -416,35 +404,12 @@ class BibliographStorageFS extends libBibliographStorageBase
 
 				if (!tmpRecordDeltaContainer || !tmpRecordDeltaContainer.hasOwnProperty('Deltas') || !tmpRecordDeltaContainer.hasOwnProperty('RecordGUID'))
 				{
-					// TODO: Should this code fix it at the storage driver layer?
 					this.log.warn(`Record [${pSourceHash}]:[${pRecordGUID}] delta file [${tmpRecordDeltaFileName}] is not valid -- a valid delta container must be an object with RecordGUID string and a Deltas array properties.`);
 					return fCallback(null, this.generateDeltaContainer(pRecordGUID));
 				}
 
 				return fCallback(null, tmpRecordDeltaContainer);
 			}.bind(this));
-	}
-
-
-	persistRecordDelta(pSourceHash, pRecordMetadata, pDeltaContainer, fCallback)
-	{
-		if (!this.Initialized)
-		{
-			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordMetadata.GUID}] delta failed.`));
-		}
-
-		let tmpRecordDeltaFileName = `_${pRecordMetadata.GUID}_deltas.json`;
-		let tmpRecordDeltaFilePath = this.fable.FilePersistence.joinPath(this.getSourceHistoryFolderPath(pSourceHash), tmpRecordDeltaFileName);
-
-		let tmpAnticipate = this.fable.newAnticipate();
-
-		tmpAnticipate.anticipate(
-			function (fNext)
-			{
-				this.fable.FilePersistence.writeFile(tmpRecordDeltaFilePath, JSON.stringify(pDeltaContainer), 'utf8', fNext);
-			}.bind(this));
-
-		tmpAnticipate.wait(fCallback);
 	}
 
 	/**
@@ -481,6 +446,70 @@ class BibliographStorageFS extends libBibliographStorageBase
 
 			return fCallback(null, tmpKeys);
 		});
+	}
+
+	readRecordKeysByTimestamp(pSourceHash, pFromTimestamp, pToTimestamp, fCallback)
+	{
+		if (!this.Initialized)
+		{
+			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordMetadata.GUID}] delta failed.`));
+		}
+
+		let tmpRecordKeysContainer = [];
+
+		let tmpAnticipate = this.fable.newAnticipate();
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				libFS.readdir(this.getSourceMetadataFolderPath(pSourceHash), function(pError, pFiles)
+				{
+					if (pError)
+					{
+						return fCallback(pError);
+					}
+
+					for (let i = 0; i < pFiles.length; i++)
+					{
+						const tmpFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), pFiles[i]);
+						tmpAnticipate.anticipate(
+							function (fNextFile)
+							{
+								libFS.stat(tmpFilePath, function(pStatError, pFileStats)
+								{
+									if (pFileStats.isFile())
+									{
+										const tmpModifiedTime = pFileStats.mtime;
+										if (tmpModifiedTime >= pFromTimestamp && tmpModifiedTime <= pToTimestamp)
+										{
+											tmpRecordKeysContainer.push(this.getRecordKeyFromMetadataFileName(pFiles[i]));
+										}
+									}
+									return fNextFile(pStatError);
+								}.bind(this))
+							}.bind(this));
+					}
+
+					return fNext(null);
+				}.bind(this));
+			}.bind(this));
+
+		tmpAnticipate.wait(
+			function (pError)
+			{
+				if (pError)
+				{
+					return fCallback(pError);
+				}
+
+				if (!Array.isArray(tmpRecordKeysContainer))
+				{
+					this.log.warn(`Read record keys failed for record source [${pSourceHash}]: ${pError}`);
+					return fCallback(null, []);
+				}
+
+				return fCallback(null, tmpRecordKeysContainer);
+			}.bind(this));
 	}
 
 	/**
@@ -543,7 +572,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 				}
 				catch(pDeserializeError)
 				{
-					this.fable.log.error(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in file [${tmpRecordFileName}] full path [${tmpRecordFilePath}]: ${pDeserializeError}`);
+					this.fable.log.error(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in Record file [${tmpRecordFileName}] full path [${tmpRecordFilePath}]: ${pDeserializeError}`);
 					return fCallback(pDeserializeError);
 				}
 			}.bind(this));
@@ -571,6 +600,71 @@ class BibliographStorageFS extends libBibliographStorageBase
 		this.fable.FilePersistence.writeFile(tmpRecordFilePath, pRecordJSON, 'utf8', fCallback);
 	}
 
+
+	/**
+	 * Saves the delta container of a record
+	 *
+	 * @param {string} pSourceHash - The source hash identifying the record's source folder.
+	 * @param {object} pRecordMetadata - the Metadata object for the record
+	 * @param {object} pDeltaContainer - the delta snapshots object for the record
+	 * @throws {Error} If the storage is not initialized, an error is passed to the callback.
+	 */
+	persistRecordDelta(pSourceHash, pRecordMetadata, pDeltaContainer, fCallback)
+	{
+		if (!this.Initialized)
+		{
+			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordMetadata.GUID}] delta failed.`));
+		}
+
+		let tmpRecordDeltaFileName = `_${pRecordMetadata.GUID}_deltas.json`;
+		let tmpRecordDeltaFilePath = this.fable.FilePersistence.joinPath(this.getSourceHistoryFolderPath(pSourceHash), tmpRecordDeltaFileName);
+
+		let tmpAnticipate = this.fable.newAnticipate();
+
+		tmpAnticipate.anticipate(
+			function (fNext)
+			{
+				this.fable.FilePersistence.writeFile(tmpRecordDeltaFilePath, JSON.stringify(pDeltaContainer), 'utf8', fNext);
+			}.bind(this));
+
+		tmpAnticipate.wait(fCallback);
+	}
+
+
+	// For filesystem, the modified time of the metadata file is analagous with
+	// the record timestamp, so no need to do anything explicit like with
+	// the indexed methods.
+	// stampRecordTimestamp(pSourceHash, pRecordGUID, fCallback)
+	// {
+	// 	return fCallback(null);
+	// }
+
+
+	/**
+	 * Writes metadata for a specific record to a file in the filesystem.
+	 *
+	 * @param {string} pSourceHash - The hash of the source to which the record belongs.
+	 * @param {string} pRecordGUID - The unique identifier (GUID) of the record.
+	 * @param {Object} pMetadata - The metadata object to be written to the file.
+	 * @param {Function} fCallback - The callback function to execute after the operation.
+	 *                                It receives an error as the first argument if the operation fails.
+	 *
+	 * @throws {Error} Throws an error if the storage is not initialized.
+	 */
+	persistRecordMetadata(pSourceHash, pRecordGUID, pMetadata, fCallback)
+	{
+		if (!this.Initialized)
+		{
+			return fCallback(new Error(`Bibliograph FS Storage not initialized; write of record [${pSourceHash}]:[${pRecordGUID}] metadata failed.`));
+		}
+
+		let tmpRecordMetadataFileName = `_${pRecordGUID}_metadata.json`;
+		let tmpRecordMetadataFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordMetadataFileName);
+		let tmpRecordMetadataJSON = JSON.stringify(pMetadata);
+
+		this.fable.FilePersistence.writeFile(tmpRecordMetadataFilePath, tmpRecordMetadataJSON, 'utf8', fCallback);
+	}
+
 	/**
 	 * Deletes a record file from the file system based on the provided source hash and record GUID.
 	 *
@@ -579,7 +673,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 	 * @param {Function} fCallback - A callback function to handle the result of the delete operation.
 	 * @throws {Error} If the storage is not initialized, an error is passed to the callback.
 	 */
-	delete(pSourceHash, pRecordGUID, fCallback)
+	persistDelete(pSourceHash, pRecordGUID, fCallback)
 	{
 		if (!this.Initialized)
 		{
@@ -600,35 +694,8 @@ class BibliographStorageFS extends libBibliographStorageBase
 		tmpAnticipate.anticipate(
 			function (fNext)
 			{
-				this.fable.FilePersistence.readFile(tmpRecordFilePath, 'utf8',
-					function(pError, pData)
-					{
-						if (pError)
-						{
-							return fCallback(pError);
-						}
-
-						try
-						{
-							console.log(JSON.stringify(JSON.parse(pData), null, 4));
-							return fNext();
-						}
-						catch(pDeserializeError)
-						{
-							this.fable.log.warn(`Error deserializing [${pSourceHash}]:[${pRecordGUID}] in file [${tmpRecordFileName}] full path [${tmpRecordFilePath}]: ${pDeserializeError} -- delete will continue.`);
-							return fNext();
-						}
-					}.bind(this));
-
-			}.bind(this));
-
-		tmpAnticipate.anticipate(
-			function (fNext)
-			{
 				libFS.unlink(tmpRecordFilePath, fNext);
 			}.bind(this));
-
-		// TODO: Set the delete date stamp on the metadata for the record.
 
 		tmpAnticipate.wait(fCallback);
 	}
