@@ -250,7 +250,6 @@ suite
 								});
 							});
 
-
 						// Exercise change tracking
 						// This changes nothing, so shouldn't result in a persist
 						_Anticipate.anticipate(
