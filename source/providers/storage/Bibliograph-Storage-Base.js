@@ -8,6 +8,8 @@ class BibliographServiceStorageBase extends libPictProvider
 	{
 		super(pFable, pOptions, pServiceHash);
 		this.serviceType = 'BibliographStorage';
+
+		this.LogWriteMismatchReason = this.pict.settings['Bibliograph-Log-Write-Mismatch-Reason'];
 	}
 
 	/**
@@ -53,7 +55,6 @@ class BibliographServiceStorageBase extends libPictProvider
 	 *   - `QHash`: A "quick" crc-like hash of the JSON string using an insecure hash function.
 	 *   - `MD5`: The MD5 hash of the JSON string.
 	 *   - `Ingest`: The timestamp (in milliseconds) when the metadata was generated.
-
 	 * @param {string} pRecordGUID - The unique identifier (GUID) of the record.
 	 * @param {string} pRecordJSONString - The JSON string representation of the record.
 	 * @returns {Object} An object containing metadata for the record, including:
@@ -303,17 +304,17 @@ class BibliographServiceStorageBase extends libPictProvider
 						}
 						else if (tmpExistingMetadata.Length !== tmpNewRecordMetadata.Length)
 						{
-							this.log.warn(`Record lengths do not match: ${tmpExistingMetadata.Length} != ${tmpNewRecordMetadata.Length}`);
+							if (this.LogWriteMismatchReason) this.log.warn(`Record lengths do not match: ${tmpExistingMetadata.Length} != ${tmpNewRecordMetadata.Length}`);
 							return fNext();
 						}
 						else if (tmpExistingMetadata.QHash !== tmpNewRecordMetadata.QHash)
 						{
-							this.log.warn(`Record hashes do not match: ${tmpExistingMetadata.QHash} != ${tmpNewRecordMetadata.QHash}`);
+							if (this.LogWriteMismatchReason) this.log.warn(`Record hashes do not match: ${tmpExistingMetadata.QHash} != ${tmpNewRecordMetadata.QHash}`);
 							return fNext();
 						}
 						else if (tmpExistingMetadata.MD5 !== tmpNewRecordMetadata.MD5)
 						{
-							this.log.warn(`Record hashes do not match: ${tmpExistingMetadata.MD5} != ${tmpNewRecordMetadata.MD5}`);
+							if (this.LogWriteMismatchReason) this.log.warn(`Record hashes do not match: ${tmpExistingMetadata.MD5} != ${tmpNewRecordMetadata.MD5}`);
 							return fNext();
 						}
 
