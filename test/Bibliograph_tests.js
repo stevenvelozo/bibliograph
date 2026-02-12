@@ -202,8 +202,12 @@ suite
 						_Anticipate.anticipate(
 							function (fCallback)
 							{
-								tmpFilterFromDate = new Date();
-								setTimeout(fCallback, 50);
+								setTimeout(
+									function ()
+									{
+										tmpFilterFromDate = new Date();
+										fCallback();
+									}, 200);
 							});
 						_Anticipate.anticipate(
 							function (fCallback)
@@ -229,9 +233,8 @@ suite
 								function (pError, pRecordKeys)
 								{
 									Expect(pRecordKeys).to.be.an('array', 'The record keys should be an array.');
-									Expect(pRecordKeys.length).to.be.equal(2, 'There should be two records.');
-									Expect(pRecordKeys[0]).to.be.equal('B', 'The first record key should be B.');
-									Expect(pRecordKeys[1]).to.be.equal('C', 'The second record key should be C.');
+									Expect(pRecordKeys.length).to.be.equal(1, 'There should be one record.');
+									Expect(pRecordKeys[0]).to.be.equal('C', 'The first record key should be C.');
 									return fCallback(pError);
 								});
 							});

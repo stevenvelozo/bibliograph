@@ -24,7 +24,7 @@
     },
     "homepage": "https://github.com/stevenvelozo/bibliograph#readme",
     "devDependencies": {
-        "quackage": "^1.0.38"
+        "quackage": "^1.0.47"
     },
     "mocha": {
         "diff": true,
@@ -45,7 +45,7 @@
         ]
     },
     "dependencies": {
-        "pict": "^1.0.234",
-        "pict-provider": "^1.0.3"
+        "pict": "^1.0.343",
+        "pict-provider": "^1.0.7"
     }
 }
