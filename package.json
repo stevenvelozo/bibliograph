@@ -1,6 +1,6 @@
 {
     "name": "bibliograph",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Key value record comprehension service.  Raw data.",
     "main": "source/Bibliograph.js",
     "bin": {
