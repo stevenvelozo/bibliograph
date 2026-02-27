@@ -1,6 +1,6 @@
 {
     "name": "bibliograph",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "Key value record comprehension service.  Raw data.",
     "main": "source/Bibliograph.js",
     "bin": {
@@ -45,7 +45,7 @@
         ]
     },
     "dependencies": {
-        "pict": "^1.0.347",
-        "pict-provider": "^1.0.9"
+        "pict": "^1.0.355",
+        "pict-provider": "^1.0.12"
     }
 }
