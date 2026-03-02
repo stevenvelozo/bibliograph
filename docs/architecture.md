@@ -4,20 +4,76 @@ Bibliograph is structured as a set of Pict services organized into three layers:
 
 ## Service Hierarchy
 
-```
-Pict Instance
-├── Bibliograph (BibliographService)
-│   Main facade -- validates inputs, delegates to storage
-│
-├── BibliographStorage (BibliographStorageFS or custom provider)
-│   Handles persistence -- reads, writes, metadata, deltas
-│   Extends BibliographStorageBase
-│
-└── BibliographRecordDiff (BibliographRecordDiff)
-    Compares records and generates deltas
+```mermaid
+graph TB
+	subgraph Pict Instance
+		BIB["Bibliograph<br/>(BibliographService)"]
+		STORE["BibliographStorage<br/>(BibliographStorageFS or custom)"]
+		DIFF["BibliographRecordDiff<br/>(BibliographRecordDiff)"]
+	end
+	BIB -->|"delegates storage"| STORE
+	BIB -->|"auto-provisions"| DIFF
+	STORE -->|"extends"| BASE["BibliographStorageBase"]
 ```
 
 All three services are registered on the Pict instance and are accessible as `_Pict.Bibliograph`, `_Pict.BibliographStorage`, and `_Pict.BibliographRecordDiff`.
+
+## Class Hierarchy
+
+```mermaid
+classDiagram
+	class BibliographService {
+		+serviceType: 'Bibliograph'
+		+initialize(fCallback)
+		+recordHash(pString)
+		+createSource(pSourceHash, fCallback)
+		+checkSourceExists(pSourceHash, fCallback)
+		+write(pSourceHash, pRecordGUID, pRecord, fCallback)
+		+read(pSourceHash, pRecordGUID, fCallback)
+		+delete(pSourceHash, pRecordGUID, fCallback)
+		+exists(pSourceHash, pRecordGUID, fCallback)
+		+readRecordKeys(pSourceHash, fCallback)
+		+readRecordKeysByTimestamp(pSourceHash, pStart, pEnd, fCallback)
+		+readRecordMetadata(pSourceHash, pRecordGUID, fCallback)
+		+readRecordDelta(pSourceHash, pRecordGUID, fCallback)
+	}
+	class BibliographStorageBase {
+		+serviceType: 'BibliographStorage'
+		+initialize(fCallback)
+		+sourceExists(pSourceHash, fCallback)
+		+sourceCreate(pSourceHash, fCallback)
+		+generateMetadataForRecord(pRecordGUID, pJSON)
+		+generateDeltaContainer(pRecordGUID)
+		+write(pSourceHash, pRecordGUID, pRecord, fCallback)
+		+delete(pSourceHash, pRecordGUID, fCallback)
+		+read(pSourceHash, pRecordGUID, fCallback)
+		+persistRecord(pSourceHash, pRecordGUID, pJSON, fCallback)
+		+persistDelete(pSourceHash, pRecordGUID, fCallback)
+		+readRecordMetadata(pSourceHash, pRecordGUID, fCallback)
+		+persistRecordMetadata(pSourceHash, pRecordGUID, pMeta, fCallback)
+		+readRecordDelta(pSourceHash, pRecordGUID, fCallback)
+		+persistRecordDelta(pSourceHash, pMeta, pDelta, fCallback)
+		+writeRecordDelta(pSourceHash, pMeta, pDelta, fCallback)
+	}
+	class BibliographStorageFS {
+		+StorageFolder: string
+		+Initialized: boolean
+		+setStorageFolder(pPath)
+		+createStorageFolder(fCallback)
+		+checkStorageFolder(fCallback)
+		+createSourceFolder(pSourceHash, fCallback)
+		+getRecordFileLocationData(pSourceHash, pRecordGUID)
+	}
+	class BibliographRecordDiff {
+		+serviceType: 'BibliographRecordDiff'
+		+diffRecords(pOldRecord, pNewRecord)
+		+generateDiffDelta(pOldRecord, pNewRecord, pDiff)
+		+generateDelta(pOldRecord, pNewRecord)
+	}
+	BibliographService --> BibliographStorageBase : delegates to
+	BibliographService --> BibliographRecordDiff : uses
+	BibliographStorageBase <|-- BibliographStorageFS
+```
 
 ## BibliographService
 
@@ -30,6 +86,48 @@ Responsibilities:
 - Automatic provisioning of the storage provider and diff service on construction
 
 When instantiated, it checks whether `BibliographStorage` and `BibliographRecordDiff` services already exist on the Pict instance. If not, it creates them automatically. This means you can swap in a custom storage provider before instantiating Bibliograph, and it will use yours instead.
+
+## Write Flow
+
+The write operation is the most complex flow in Bibliograph. It handles merging, deduplication, metadata, and delta tracking:
+
+```mermaid
+flowchart TD
+	A["write(hash, guid, record, cb)"] --> B["read existing record"]
+	B --> C["Merge: { ...existing, ...new }"]
+	C --> D["JSON.stringify merged record"]
+	D --> E["generateMetadataForRecord()"]
+	E --> F{Metadata check enabled?}
+	F -->|Yes| G["readRecordMetadata()"]
+	G --> H{Content changed?}
+	H -->|No - same hash| I["Skip write"]
+	H -->|Yes - different| J["Continue"]
+	F -->|No| J
+	J --> K{Delta tracking enabled?}
+	K -->|Yes| L["diffRecords + generateDelta"]
+	L --> M["writeRecordDelta()"]
+	K -->|No| N["Skip delta"]
+	M --> O["persistRecordMetadata()"]
+	N --> O
+	O --> P["persistRecord()"]
+	P --> Q["stampRecordTimestamp()"]
+	Q --> R["callback()"]
+	I --> R
+```
+
+## Delete Flow
+
+```mermaid
+flowchart TD
+	A["delete(hash, guid, cb)"] --> B["readRecordMetadata()"]
+	B --> C{Metadata exists?}
+	C -->|Yes| D["Set metadata.Deleted = timestamp"]
+	D --> E["persistRecordMetadata()"]
+	C -->|No| F["Generate stub metadata"]
+	E --> G["persistDelete()"]
+	F --> G
+	G --> H["callback()"]
+```
 
 ## Storage Provider
 
@@ -51,6 +149,29 @@ The base class contains the core write logic:
 
 This logic lives in the base class so all storage providers share the same deduplication and delta behavior.
 
+## Storage Provider Architecture
+
+```mermaid
+graph TB
+	subgraph "Bibliograph Core"
+		BSB["BibliographStorageBase<br/>(write/delete logic, metadata, deltas)"]
+	end
+	subgraph "Built-in"
+		BSFS["BibliographStorageFS<br/>(JSON files on disk)"]
+	end
+	subgraph "External Providers"
+		BSM["bibliograph-storage-meadow<br/>(SQLite, MySQL, PostgreSQL, MSSQL)"]
+		BSL["bibliograph-storage-lmdb"]
+		BSLDB["bibliograph-storage-leveldb"]
+		BSR["bibliograph-storage-rocksdb"]
+	end
+	BSB --> BSFS
+	BSB --> BSM
+	BSB --> BSL
+	BSB --> BSLDB
+	BSB --> BSR
+```
+
 ## File System Layout
 
 The FS storage provider creates this folder structure:
@@ -68,6 +189,17 @@ Each source gets its own folder with three subfolders for the three types of dat
 ## Record Diff Service
 
 **BibliographRecordDiff** (`source/services/record/Bibliograph-Record-Diff.js`) compares two JSON record objects and identifies which fields differ.
+
+```mermaid
+flowchart LR
+	A["Old Record"] --> D["diffRecords()"]
+	B["New Record"] --> D
+	D --> E{Match?}
+	E -->|"M: 1"| F["No changes"]
+	E -->|"M: 0"| G["V: changed field names"]
+	G --> H["generateDiffDelta()"]
+	H --> I["Delta object with new values"]
+```
 
 The diff result uses a compressed format optimized for storage at scale:
 
@@ -105,6 +237,21 @@ Every record write generates a metadata object:
 - **Ingest** -- Millisecond timestamp of when the record was written
 
 The deduplication check compares Length, then QHash, then MD5 -- stopping early when possible for performance.
+
+## Deduplication Check Order
+
+```mermaid
+flowchart TD
+	A["New metadata"] --> B{GUID match?}
+	B -->|No| C["ERROR: GUID mismatch"]
+	B -->|Yes| D{Length match?}
+	D -->|No| E["Record changed -- write"]
+	D -->|Yes| F{QHash match?}
+	F -->|No| G["Record changed -- write"]
+	F -->|Yes| H{MD5 match?}
+	H -->|No| I["Record changed -- write"]
+	H -->|Yes| J["Identical -- skip write"]
+```
 
 ## Delta Container Structure
 

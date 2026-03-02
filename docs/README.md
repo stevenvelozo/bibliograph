@@ -84,6 +84,7 @@ tmpAnticipate.wait(
 - [Quick Start](quick-start.md) -- Setup and first operations
 - [Architecture](architecture.md) -- How the service is structured
 - [Configuration](configuration.md) -- Settings reference
-- [API Reference](api.md) -- Full method documentation
+- [API Reference](api/reference.md) -- Full method documentation
 - [CLI](cli.md) -- Command-line interface
 - [Data Operations](operations/write.md) -- Detailed guides for each operation
+- [Storage Providers](storage-providers.md) -- Pluggable backend architecture

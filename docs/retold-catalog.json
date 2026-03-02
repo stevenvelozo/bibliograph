@@ -1,5 +1,5 @@
 {
-	"Generated": "2026-02-18T03:26:09.991Z",
+	"Generated": "2026-03-02T01:45:13.772Z",
 	"GitHubOrg": "stevenvelozo",
 	"DefaultBranch": "master",
 	"Groups": [
@@ -8,16 +8,6 @@
 			"Key": "debug",
 			"Description": "",
 			"Modules": [
-				{
-					"Name": "data",
-					"Repo": "data",
-					"Group": "debug",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				},
 				{
 					"Name": "exercises",
 					"Repo": "exercises",
@@ -62,6 +52,58 @@
 			"Key": "docs",
 			"Description": "",
 			"Modules": [
+				{
+					"Name": "api",
+					"Repo": "api",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"api/checkSourceExists.md",
+						"api/createSource.md",
+						"api/delete.md",
+						"api/diffRecords.md",
+						"api/exists.md",
+						"api/generateDelta.md",
+						"api/generateDiffDelta.md",
+						"api/initialize.md",
+						"api/read.md",
+						"api/readRecordDelta.md",
+						"api/readRecordKeys.md",
+						"api/readRecordKeysByTimestamp.md",
+						"api/readRecordMetadata.md",
+						"api/recordHash.md",
+						"api/reference.md",
+						"api/write.md"
+					]
+				},
+				{
+					"Name": "css",
+					"Repo": "css",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"css/docuserve.css"
+					]
+				},
+				{
+					"Name": "js",
+					"Repo": "js",
+					"Group": "docs",
+					"Branch": "master",
+					"HasDocs": true,
+					"HasCover": false,
+					"Sidebar": [],
+					"DocFiles": [
+						"js/pict.min.js",
+						"js/pict.min.js.map"
+					]
+				},
 				{
 					"Name": "operations",
 					"Repo": "operations",

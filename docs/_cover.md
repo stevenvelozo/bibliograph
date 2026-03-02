@@ -1,15 +1,17 @@
 # Bibliograph
 
-> Raw record storage with change tracking
+> Key-value record comprehension service <small>v0.1.2</small>
 
-A key-value record comprehension service for Node.js. Bibliograph stores raw JSON records across multiple sources with automatic metadata generation, hash-based deduplication, and field-level change tracking.
+Store raw JSON records across multiple sources with automatic metadata generation, hash-based deduplication, and field-level change tracking.
 
-- **Sources** -- Organize records into named collections
-- **Deduplication** -- Hash-based detection skips redundant writes
-- **Change Tracking** -- Field-level deltas record what changed and when
-- **Pluggable Storage** -- File system built in, with LMDB, LevelDB, and RocksDB backends available
+- **Source-Organized Storage** -- named collections for multi-feed ingestion
+- **Hash-Based Deduplication** -- skip writes when content is unchanged
+- **Partial Record Merging** -- merge new fields with existing records
+- **Field-Level Change Tracking** -- delta history of what changed and when
+- **Pluggable Storage** -- file system, Meadow, LMDB, LevelDB, RocksDB
+- **CLI Tool** -- manage records from the command line
 
 [Quick Start](quick-start.md)
-[API Reference](api.md)
-[Data Operations](operations/write.md)
+[API Reference](api/reference.md)
+[Architecture](architecture.md)
 [GitHub](https://github.com/stevenvelozo/bibliograph)
