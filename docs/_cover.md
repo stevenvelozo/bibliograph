@@ -1,6 +1,6 @@
 # Bibliograph
 
-> Key-value record comprehension service <small>v0.1.2</small>
+> Key-value record comprehension service
 
 Store raw JSON records across multiple sources with automatic metadata generation, hash-based deduplication, and field-level change tracking.
 
