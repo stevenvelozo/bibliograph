@@ -1,5 +1,6 @@
 const libBibliographStorageBase = require('./Bibliograph-Storage-Base.js');
 const libFS = require('fs');
+const libPath = require('path');
 
 class BibliographStorageFS extends libBibliographStorageBase
 {
@@ -12,6 +13,113 @@ class BibliographStorageFS extends libBibliographStorageBase
 		this.StorageFolder = false;
 
 		this.Initialized = false;
+
+		// Per-record async queue. The Base.write() method orchestrates several
+		// filesystem reads and writes against the same record (read, read
+		// metadata, read delta, write delta, write metadata, write record) and
+		// that entire sequence must run to completion before another writer
+		// for the same record begins — otherwise readers catch mid-truncate
+		// `fs.writeFile` calls (empty file → "Unexpected end of JSON input")
+		// and concurrent writers leave trailing bytes from a longer predecessor
+		// past the end of a shorter successor. Keyed by
+		// `${pSourceHash}:${pRecordGUID}`.
+		this._recordLocks = new Map();
+
+		// Monotonic counter for generating unique temp-file suffixes during
+		// atomic writes (combined with pid and time for cross-process safety
+		// when multiple retold processes share a cache path).
+		this._atomicWriteCounter = 0;
+	}
+
+	/**
+	 * Serialize an async operation on a record so that a given record's
+	 * read-modify-write sequence never interleaves with another.
+	 *
+	 * @param {string}   pLockKey  - Key uniquely identifying the record
+	 * @param {Function} fOperation - (fDone) => void — perform the work, call fDone(error, result)
+	 * @param {Function} fCallback - (error, result) => void — invoked after the operation completes
+	 */
+	_lockRecord(pLockKey, fOperation, fCallback)
+	{
+		let tmpSelf = this;
+		let tmpPrev = this._recordLocks.get(pLockKey) || Promise.resolve();
+		let tmpNext = tmpPrev.then(() => new Promise((pResolve) =>
+		{
+			try
+			{
+				fOperation((pError, pResult) =>
+				{
+					pResolve({ Error: pError, Result: pResult });
+				});
+			}
+			catch (pSyncError)
+			{
+				pResolve({ Error: pSyncError, Result: undefined });
+			}
+		}));
+		this._recordLocks.set(pLockKey, tmpNext);
+		tmpNext.then((pOutcome) =>
+		{
+			// If we're the tail of the chain, clear the entry to avoid a leak
+			if (tmpSelf._recordLocks.get(pLockKey) === tmpNext)
+			{
+				tmpSelf._recordLocks.delete(pLockKey);
+			}
+			fCallback(pOutcome.Error, pOutcome.Result);
+		});
+	}
+
+	/**
+	 * Atomically write a file: write content to a temporary sibling and then
+	 * rename over the target. `fs.rename` is atomic on POSIX filesystems
+	 * (same directory), so concurrent readers never see a partial/truncated
+	 * file and concurrent writers can no longer leave a shorter write's
+	 * content followed by trailing bytes from a longer predecessor.
+	 *
+	 * @param {string}   pFilePath  - Absolute destination path
+	 * @param {string}   pContent   - File content to write
+	 * @param {string}   pEncoding  - Encoding (typically 'utf8')
+	 * @param {Function} fCallback  - (error) => void
+	 */
+	_writeFileAtomic(pFilePath, pContent, pEncoding, fCallback)
+	{
+		this._atomicWriteCounter = (this._atomicWriteCounter + 1) >>> 0;
+		let tmpSuffix = '.tmp.' + process.pid + '.' + Date.now().toString(36) + '.' + this._atomicWriteCounter.toString(36);
+		let tmpTempPath = pFilePath + tmpSuffix;
+		libFS.writeFile(tmpTempPath, pContent, pEncoding, (pWriteError) =>
+		{
+			if (pWriteError)
+			{
+				libFS.unlink(tmpTempPath, () => fCallback(pWriteError));
+				return;
+			}
+			libFS.rename(tmpTempPath, pFilePath, (pRenameError) =>
+			{
+				if (pRenameError)
+				{
+					libFS.unlink(tmpTempPath, () => fCallback(pRenameError));
+					return;
+				}
+				return fCallback();
+			});
+		});
+	}
+
+	/**
+	 * Override of Base.write that serializes the entire read-modify-write
+	 * sequence per record. All of Base.write's sub-calls (`this.read`,
+	 * `this.readRecordMetadata`, `this.readRecordDelta`, `this.persist*`,
+	 * `this.stampRecordTimestamp`) are polymorphic and resolve back to this
+	 * class, so holding the lock here covers the whole transaction.
+	 */
+	write(pSourceHash, pRecordGUID, pNewPartialRecord, fCallback)
+	{
+		let tmpSelf = this;
+		let tmpLockKey = `${pSourceHash}:${pRecordGUID}`;
+		this._lockRecord(tmpLockKey, (fDone) =>
+		{
+			super.write(pSourceHash, pRecordGUID, pNewPartialRecord, fDone);
+		}, fCallback);
 	}
 
 	/**
@@ -597,7 +705,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 		let tmpRecordFileName = `${pRecordGUID}.json`;
 		let tmpRecordFilePath = this.fable.FilePersistence.joinPath(this.getSourceRecordFolderPath(pSourceHash), tmpRecordFileName);
 
-		this.fable.FilePersistence.writeFile(tmpRecordFilePath, pRecordJSON, 'utf8', fCallback);
+		this._writeFileAtomic(tmpRecordFilePath, pRecordJSON, 'utf8', fCallback);
 	}
 
 
@@ -624,7 +732,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 		tmpAnticipate.anticipate(
 			function (fNext)
 			{
-				this.fable.FilePersistence.writeFile(tmpRecordDeltaFilePath, JSON.stringify(pDeltaContainer), 'utf8', fNext);
+				this._writeFileAtomic(tmpRecordDeltaFilePath, JSON.stringify(pDeltaContainer), 'utf8', fNext);
 			}.bind(this));
 
 		tmpAnticipate.wait(fCallback);
@@ -662,7 +770,7 @@ class BibliographStorageFS extends libBibliographStorageBase
 		let tmpRecordMetadataFilePath = this.fable.FilePersistence.joinPath(this.getSourceMetadataFolderPath(pSourceHash), tmpRecordMetadataFileName);
 		let tmpRecordMetadataJSON = JSON.stringify(pMetadata);
 
-		this.fable.FilePersistence.writeFile(tmpRecordMetadataFilePath, tmpRecordMetadataJSON, 'utf8', fCallback);
+		this._writeFileAtomic(tmpRecordMetadataFilePath, tmpRecordMetadataJSON, 'utf8', fCallback);
 	}
 
 	/**
