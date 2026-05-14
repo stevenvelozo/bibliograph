@@ -1,6 +1,6 @@
 {
     "name": "bibliograph",
-    "version": "0.1.7",
+    "version": "1.0.0",
     "description": "Key value record comprehension service.  Raw data.",
     "main": "source/Bibliograph.js",
     "bin": {
@@ -24,7 +24,7 @@
     },
     "homepage": "https://github.com/stevenvelozo/bibliograph#readme",
     "devDependencies": {
-        "pict-docuserve": "^1.0.1",
+        "pict-docuserve": "^1.2.0",
         "quackage": "^1.2.3"
     },
     "mocha": {
