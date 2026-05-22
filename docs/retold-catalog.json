@@ -1,166 +1,236 @@
 {
-	"Generated": "2026-04-10T17:20:05.446Z",
+	"Generated": "2026-05-22T05:38:45.976Z",
+	"Mode": "module",
 	"GitHubOrg": "stevenvelozo",
 	"DefaultBranch": "master",
-	"Groups": [
-		{
-			"Name": "Debug",
-			"Key": "debug",
-			"Description": "",
-			"Modules": [
-				{
-					"Name": "exercises",
-					"Repo": "exercises",
-					"Group": "debug",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				},
-				{
-					"Name": "input",
-					"Repo": "input",
-					"Group": "debug",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				}
-			]
-		},
-		{
-			"Name": "Dist",
-			"Key": "dist",
-			"Description": "",
-			"Modules": [
-				{
-					"Name": "indoctrinate_content_staging",
-					"Repo": "indoctrinate_content_staging",
-					"Group": "dist",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				}
-			]
-		},
-		{
-			"Name": "Docs",
-			"Key": "docs",
-			"Description": "",
-			"Modules": [
-				{
-					"Name": "api",
-					"Repo": "api",
-					"Group": "docs",
-					"Branch": "master",
-					"HasDocs": true,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": [
-						"api/checkSourceExists.md",
-						"api/createSource.md",
-						"api/delete.md",
-						"api/diffRecords.md",
-						"api/exists.md",
-						"api/generateDelta.md",
-						"api/generateDiffDelta.md",
-						"api/initialize.md",
-						"api/read.md",
-						"api/readRecordDelta.md",
-						"api/readRecordKeys.md",
-						"api/readRecordKeysByTimestamp.md",
-						"api/readRecordMetadata.md",
-						"api/recordHash.md",
-						"api/reference.md",
-						"api/write.md"
-					]
-				},
-				{
-					"Name": "css",
-					"Repo": "css",
-					"Group": "docs",
-					"Branch": "master",
-					"HasDocs": true,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": [
-						"css/docuserve.css"
-					]
-				},
-				{
-					"Name": "js",
-					"Repo": "js",
-					"Group": "docs",
-					"Branch": "master",
-					"HasDocs": true,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": [
-						"js/pict.min.js",
-						"js/pict.min.js.map"
-					]
-				},
-				{
-					"Name": "operations",
-					"Repo": "operations",
-					"Group": "docs",
-					"Branch": "master",
-					"HasDocs": true,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": [
-						"operations/delete.md",
-						"operations/diff-and-deltas.md",
-						"operations/exists.md",
-						"operations/metadata.md",
-						"operations/read.md",
-						"operations/record-keys.md",
-						"operations/sources.md",
-						"operations/write.md"
-					]
-				}
-			]
-		},
-		{
-			"Name": "Source",
-			"Key": "source",
-			"Description": "",
-			"Modules": [
-				{
-					"Name": "commands",
-					"Repo": "commands",
-					"Group": "source",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				},
-				{
-					"Name": "providers",
-					"Repo": "providers",
-					"Group": "source",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				},
-				{
-					"Name": "services",
-					"Repo": "services",
-					"Group": "source",
-					"Branch": "master",
-					"HasDocs": false,
-					"HasCover": false,
-					"Sidebar": [],
-					"DocFiles": []
-				}
-			]
-		}
-	]
+	"Module": {
+		"Name": "bibliograph",
+		"Repo": "bibliograph",
+		"Group": "",
+		"Branch": "master",
+		"HasDocs": true,
+		"HasCover": true,
+		"Sidebar": [
+			{
+				"Title": "Getting Started",
+				"Children": [
+					{
+						"Title": "Overview",
+						"Path": "README.md"
+					},
+					{
+						"Title": "Quick Start",
+						"Path": "quick-start.md"
+					},
+					{
+						"Title": "Configuration",
+						"Path": "configuration.md"
+					}
+				]
+			},
+			{
+				"Title": "Architecture",
+				"Children": [
+					{
+						"Title": "Design",
+						"Path": "architecture.md"
+					},
+					{
+						"Title": "Storage Providers",
+						"Path": "storage-providers.md"
+					}
+				]
+			},
+			{
+				"Title": "Data Operations",
+				"Children": [
+					{
+						"Title": "Write",
+						"Path": "operations/write.md"
+					},
+					{
+						"Title": "Read",
+						"Path": "operations/read.md"
+					},
+					{
+						"Title": "Delete",
+						"Path": "operations/delete.md"
+					},
+					{
+						"Title": "Check Existence",
+						"Path": "operations/exists.md"
+					},
+					{
+						"Title": "Sources",
+						"Path": "operations/sources.md"
+					},
+					{
+						"Title": "Record Keys",
+						"Path": "operations/record-keys.md"
+					},
+					{
+						"Title": "Metadata",
+						"Path": "operations/metadata.md"
+					},
+					{
+						"Title": "Diff and Deltas",
+						"Path": "operations/diff-and-deltas.md"
+					}
+				]
+			},
+			{
+				"Title": "API Reference",
+				"Children": [
+					{
+						"Title": "Overview",
+						"Path": "api/reference.md"
+					},
+					{
+						"Title": "Lifecycle",
+						"Children": []
+					},
+					{
+						"Title": "initialize",
+						"Path": "api/initialize.md"
+					},
+					{
+						"Title": "Source Management",
+						"Children": []
+					},
+					{
+						"Title": "createSource",
+						"Path": "api/createSource.md"
+					},
+					{
+						"Title": "checkSourceExists",
+						"Path": "api/checkSourceExists.md"
+					},
+					{
+						"Title": "Record Operations",
+						"Children": []
+					},
+					{
+						"Title": "write",
+						"Path": "api/write.md"
+					},
+					{
+						"Title": "read",
+						"Path": "api/read.md"
+					},
+					{
+						"Title": "delete",
+						"Path": "api/delete.md"
+					},
+					{
+						"Title": "exists",
+						"Path": "api/exists.md"
+					},
+					{
+						"Title": "Metadata & Deltas",
+						"Children": []
+					},
+					{
+						"Title": "readRecordMetadata",
+						"Path": "api/readRecordMetadata.md"
+					},
+					{
+						"Title": "readRecordDelta",
+						"Path": "api/readRecordDelta.md"
+					},
+					{
+						"Title": "Key Enumeration",
+						"Children": []
+					},
+					{
+						"Title": "readRecordKeys",
+						"Path": "api/readRecordKeys.md"
+					},
+					{
+						"Title": "readRecordKeysByTimestamp",
+						"Path": "api/readRecordKeysByTimestamp.md"
+					},
+					{
+						"Title": "Utility",
+						"Children": []
+					},
+					{
+						"Title": "recordHash",
+						"Path": "api/recordHash.md"
+					},
+					{
+						"Title": "Record Diff Service",
+						"Children": []
+					},
+					{
+						"Title": "diffRecords",
+						"Path": "api/diffRecords.md"
+					},
+					{
+						"Title": "generateDiffDelta",
+						"Path": "api/generateDiffDelta.md"
+					},
+					{
+						"Title": "generateDelta",
+						"Path": "api/generateDelta.md"
+					}
+				]
+			},
+			{
+				"Title": "Reference",
+				"Children": [
+					{
+						"Title": "CLI",
+						"Path": "cli.md"
+					}
+				]
+			}
+		],
+		"DocFiles": [
+			".nojekyll",
+			"README.md",
+			"_brand.json",
+			"_cover.md",
+			"_sidebar.md",
+			"_topbar.md",
+			"_version.json",
+			"api/checkSourceExists.md",
+			"api/createSource.md",
+			"api/delete.md",
+			"api/diffRecords.md",
+			"api/exists.md",
+			"api/generateDelta.md",
+			"api/generateDiffDelta.md",
+			"api/initialize.md",
+			"api/read.md",
+			"api/readRecordDelta.md",
+			"api/readRecordKeys.md",
+			"api/readRecordKeysByTimestamp.md",
+			"api/readRecordMetadata.md",
+			"api/recordHash.md",
+			"api/reference.md",
+			"api/write.md",
+			"api.md",
+			"architecture.md",
+			"cli.md",
+			"configuration.md",
+			"index.html",
+			"js/pict.min.js",
+			"js/pict.min.js.map",
+			"operations/delete.md",
+			"operations/diff-and-deltas.md",
+			"operations/exists.md",
+			"operations/metadata.md",
+			"operations/read.md",
+			"operations/record-keys.md",
+			"operations/sources.md",
+			"operations/write.md",
+			"pict-docuserve.min.js",
+			"pict-docuserve.min.js.map",
+			"quick-start.md",
+			"retold-catalog.json",
+			"retold-keyword-index.json",
+			"storage-providers.md"
+		]
+	},
+	"Groups": []
 }
