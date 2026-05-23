@@ -21,43 +21,43 @@ If no `BibliographStorage` service exists on the Pict instance, the constructor 
 
 | Method | Description |
 |--------|-------------|
-| [`initialize(fCallback)`](api/initialize.md) | Initialize the storage provider |
+| [`initialize(fCallback)`](initialize.md) | Initialize the storage provider |
 
 ### Source Management
 
 | Method | Description |
 |--------|-------------|
-| [`createSource(pSourceHash, fCallback)`](api/createSource.md) | Create a named record collection |
-| [`checkSourceExists(pSourceHash, fCallback)`](api/checkSourceExists.md) | Check if a source exists |
+| [`createSource(pSourceHash, fCallback)`](createSource.md) | Create a named record collection |
+| [`checkSourceExists(pSourceHash, fCallback)`](checkSourceExists.md) | Check if a source exists |
 
 ### Record Operations
 
 | Method | Description |
 |--------|-------------|
-| [`write(pSourceHash, pRecordGUID, pRecord, fCallback)`](api/write.md) | Write or merge a record (upsert with deduplication) |
-| [`read(pSourceHash, pRecordGUID, fCallback)`](api/read.md) | Read a record by GUID |
-| [`delete(pSourceHash, pRecordGUID, fCallback)`](api/delete.md) | Delete a record |
-| [`exists(pSourceHash, pRecordGUID, fCallback)`](api/exists.md) | Check if a record exists |
+| [`write(pSourceHash, pRecordGUID, pRecord, fCallback)`](write.md) | Write or merge a record (upsert with deduplication) |
+| [`read(pSourceHash, pRecordGUID, fCallback)`](read.md) | Read a record by GUID |
+| [`delete(pSourceHash, pRecordGUID, fCallback)`](delete.md) | Delete a record |
+| [`exists(pSourceHash, pRecordGUID, fCallback)`](exists.md) | Check if a record exists |
 
 ### Metadata & Deltas
 
 | Method | Description |
 |--------|-------------|
-| [`readRecordMetadata(pSourceHash, pRecordGUID, fCallback)`](api/readRecordMetadata.md) | Read record metadata |
-| [`readRecordDelta(pSourceHash, pRecordGUID, fCallback)`](api/readRecordDelta.md) | Read change history |
+| [`readRecordMetadata(pSourceHash, pRecordGUID, fCallback)`](readRecordMetadata.md) | Read record metadata |
+| [`readRecordDelta(pSourceHash, pRecordGUID, fCallback)`](readRecordDelta.md) | Read change history |
 
 ### Key Enumeration
 
 | Method | Description |
 |--------|-------------|
-| [`readRecordKeys(pSourceHash, fCallback)`](api/readRecordKeys.md) | List all record GUIDs in a source |
-| [`readRecordKeysByTimestamp(pSourceHash, pStart, pEnd, fCallback)`](api/readRecordKeysByTimestamp.md) | List GUIDs within a time range |
+| [`readRecordKeys(pSourceHash, fCallback)`](readRecordKeys.md) | List all record GUIDs in a source |
+| [`readRecordKeysByTimestamp(pSourceHash, pStart, pEnd, fCallback)`](readRecordKeysByTimestamp.md) | List GUIDs within a time range |
 
 ### Utility
 
 | Method | Description |
 |--------|-------------|
-| [`recordHash(pString)`](api/recordHash.md) | Generate an MD5 hash of a string |
+| [`recordHash(pString)`](recordHash.md) | Generate an MD5 hash of a string |
 
 ## BibliographRecordDiff
 
@@ -65,9 +65,9 @@ Available at `_Pict.BibliographRecordDiff` after Bibliograph instantiation.
 
 | Method | Description |
 |--------|-------------|
-| [`diffRecords(pOldRecord, pNewRecord)`](api/diffRecords.md) | Compare two records, return compressed diff |
-| [`generateDiffDelta(pOldRecord, pNewRecord, pDiff)`](api/generateDiffDelta.md) | Extract changed field values from a diff |
-| [`generateDelta(pOldRecord, pNewRecord)`](api/generateDelta.md) | Diff and extract delta in one step |
+| [`diffRecords(pOldRecord, pNewRecord)`](diffRecords.md) | Compare two records, return compressed diff |
+| [`generateDiffDelta(pOldRecord, pNewRecord, pDiff)`](generateDiffDelta.md) | Extract changed field values from a diff |
+| [`generateDelta(pOldRecord, pNewRecord)`](generateDelta.md) | Diff and extract delta in one step |
 
 ## BibliographStorageBase
 
