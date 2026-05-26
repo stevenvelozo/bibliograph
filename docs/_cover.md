@@ -14,4 +14,4 @@ Store raw JSON records across multiple sources with automatic metadata generatio
 [Quick Start](quick-start.md)
 [API Reference](api/reference.md)
 [Architecture](architecture.md)
-[GitHub](https://github.com/stevenvelozo/bibliograph)
+[GitHub](https://github.com/fable-retold/bibliograph)

@@ -1,6 +1,6 @@
 # Bibliograph
 
-> **[&#9654; Read the Bibliograph Documentation](https://stevenvelozo.github.io/bibliograph/)** &mdash; interactive docs with the full API reference.
+> **[&#9654; Read the Bibliograph Documentation](https://fable-retold.github.io/bibliograph/)** &mdash; interactive docs with the full API reference.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://badge.fury.io/js/bibliograph.svg)](https://www.npmjs.com/package/bibliograph)
@@ -141,11 +141,11 @@ npm test
 
 | Module | Purpose |
 |--------|---------|
-| [bibliograph-storage-meadow](https://github.com/stevenvelozo/bibliograph-storage-meadow) | Meadow DAL storage backend |
-| [meadow](https://github.com/stevenvelozo/meadow) | Data access layer and ORM |
-| [pict](https://github.com/stevenvelozo/pict) | MVC tools and application lifecycle |
-| [fable](https://github.com/stevenvelozo/fable) | Application framework and service manager |
-| [pict-provider](https://github.com/stevenvelozo/pict-provider) | Base class for Pict service providers |
+| [bibliograph-storage-meadow](https://github.com/fable-retold/bibliograph-storage-meadow) | Meadow DAL storage backend |
+| [meadow](https://github.com/fable-retold/meadow) | Data access layer and ORM |
+| [pict](https://github.com/fable-retold/pict) | MVC tools and application lifecycle |
+| [fable](https://github.com/fable-retold/fable) | Application framework and service manager |
+| [pict-provider](https://github.com/fable-retold/pict-provider) | Base class for Pict service providers |
 
 ## License
 

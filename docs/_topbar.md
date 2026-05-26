@@ -4,4 +4,4 @@
 - [Quick Start](quick-start.md)
 - [API Reference](api/reference.md)
 - [CLI](cli.md)
-- [GitHub](https://github.com/stevenvelozo/bibliograph)
+- [GitHub](https://github.com/fable-retold/bibliograph)
