@@ -1,6 +1,6 @@
 # Bibliograph
 
-> **[&#9654; Read the Bibliograph Documentation](https://fable-retold.github.io/bibliograph/)** &mdash; interactive docs with the full API reference.
+> **[Read the Bibliograph Documentation](https://fable-retold.github.io/bibliograph/)** - interactive docs with the full API reference.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm version](https://badge.fury.io/js/bibliograph.svg)](https://www.npmjs.com/package/bibliograph)

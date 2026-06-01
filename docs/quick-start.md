@@ -157,5 +157,5 @@ bibliograph delete -s MySource rec-001
 ## Next Steps
 
 - [Configuration](configuration.md) -- All available settings
-- [Data Operations](operations/write.md) -- Deep dive into each operation
+- [Data Operations](operations/write.md) -- Deep look at each operation
 - [Architecture](architecture.md) -- How the internals work
