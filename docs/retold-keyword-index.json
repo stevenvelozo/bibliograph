@@ -1,5 +1,5 @@
 {
-	"Generated": "2026-05-26T21:12:24.572Z",
+	"Generated": "2026-06-01T03:43:05.030Z",
 	"Mode": "module",
 	"DocumentCount": 33,
 	"LunrIndex": {
@@ -3956,7 +3956,7 @@
 					445,
 					1.993,
 					463,
-					3.759,
+					3.144,
 					464,
 					2.194,
 					465,
@@ -4997,6 +4997,8 @@
 					1.573,
 					448,
 					2.579,
+					463,
+					2.961,
 					464,
 					2.067,
 					524,
@@ -5004,8 +5006,6 @@
 					525,
 					3.541,
 					526,
-					3.541,
-					527,
 					3.541
 				]
 			],
@@ -5208,14 +5208,16 @@
 					2.129,
 					521,
 					2.129,
-					528,
+					527,
 					4.385,
+					528,
+					2.545,
 					529,
 					2.545,
 					530,
-					2.545,
-					531,
 					3.714,
+					531,
+					2.545,
 					532,
 					2.545,
 					533,
@@ -5225,15 +5227,15 @@
 					535,
 					2.545,
 					536,
-					2.545,
-					537,
 					4.385,
+					537,
+					2.545,
 					538,
 					2.545,
 					539,
-					2.545,
-					540,
 					3.714,
+					540,
+					2.545,
 					541,
 					2.545,
 					542,
@@ -5247,11 +5249,11 @@
 					546,
 					2.545,
 					547,
-					2.545,
-					548,
 					4.385,
-					549,
+					548,
 					5.126,
+					549,
+					2.545,
 					550,
 					2.545,
 					551,
@@ -5263,8 +5265,6 @@
 					554,
 					2.545,
 					555,
-					2.545,
-					556,
 					2.545
 				]
 			]
@@ -5402,7 +5402,7 @@
 			[
 				"addit",
 				{
-					"_index": 531,
+					"_index": 530,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -5482,7 +5482,7 @@
 			[
 				"altern",
 				{
-					"_index": 528,
+					"_index": 527,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -5564,7 +5564,7 @@
 			[
 				"app",
 				{
-					"_index": 542,
+					"_index": 541,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -5781,7 +5781,7 @@
 			[
 				"balanc",
 				{
-					"_index": 544,
+					"_index": 543,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -5916,7 +5916,7 @@
 			[
 				"best",
 				{
-					"_index": 538,
+					"_index": 537,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -6735,7 +6735,7 @@
 			[
 				"contract",
 				{
-					"_index": 546,
+					"_index": 545,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -7328,7 +7328,7 @@
 			[
 				"develop",
 				{
-					"_index": 533,
+					"_index": 532,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -7471,18 +7471,6 @@
 				}
 			],
 			[
-				"dive",
-				{
-					"_index": 527,
-					"title": {},
-					"module": {},
-					"group": {},
-					"body": {
-						"quick-start.md": {}
-					}
-				}
-			],
-			[
 				"document",
 				{
 					"_index": 113,
@@ -7618,7 +7606,7 @@
 			[
 				"embed",
 				{
-					"_index": 541,
+					"_index": 540,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -8179,7 +8167,7 @@
 			[
 				"fcallback",
 				{
-					"_index": 549,
+					"_index": 548,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -8801,7 +8789,7 @@
 			[
 				"heavi",
 				{
-					"_index": 545,
+					"_index": 544,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -8849,7 +8837,7 @@
 			[
 				"high",
 				{
-					"_index": 539,
+					"_index": 538,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -8861,7 +8849,7 @@
 			[
 				"higher",
 				{
-					"_index": 529,
+					"_index": 528,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -8907,7 +8895,7 @@
 			[
 				"human",
 				{
-					"_index": 535,
+					"_index": 534,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -9721,7 +9709,8 @@
 					"module": {},
 					"group": {},
 					"body": {
-						"operations/exists.md": {}
+						"operations/exists.md": {},
+						"quick-start.md": {}
 					}
 				}
 			],
@@ -10043,7 +10032,7 @@
 			[
 				"moder",
 				{
-					"_index": 534,
+					"_index": 533,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -10679,7 +10668,7 @@
 			[
 				"packag",
 				{
-					"_index": 537,
+					"_index": 536,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -10889,7 +10878,7 @@
 			[
 				"persistrecord(psourcehash",
 				{
-					"_index": 550,
+					"_index": 549,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -10901,7 +10890,7 @@
 			[
 				"pfromtimestamp",
 				{
-					"_index": 555,
+					"_index": 554,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11057,7 +11046,7 @@
 			[
 				"precordguid",
 				{
-					"_index": 548,
+					"_index": 547,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11069,7 +11058,7 @@
 			[
 				"precordjsonstr",
 				{
-					"_index": 551,
+					"_index": 550,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11285,7 +11274,7 @@
 			[
 				"ptotimestamp",
 				{
-					"_index": 556,
+					"_index": 555,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11309,7 +11298,7 @@
 			[
 				"purpos",
 				{
-					"_index": 543,
+					"_index": 542,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11458,7 +11447,7 @@
 			[
 				"read(psourcehash",
 				{
-					"_index": 547,
+					"_index": 546,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11483,7 +11472,7 @@
 			[
 				"readabl",
 				{
-					"_index": 536,
+					"_index": 535,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11523,7 +11512,7 @@
 			[
 				"readrecordkeys(psourcehash",
 				{
-					"_index": 553,
+					"_index": 552,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11549,7 +11538,7 @@
 			[
 				"readrecordkeysbytimestamp(psourcehash",
 				{
-					"_index": 554,
+					"_index": 553,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -11575,7 +11564,7 @@
 			[
 				"readrecordmetadata(psourcehash",
 				{
-					"_index": 552,
+					"_index": 551,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -12825,7 +12814,7 @@
 			[
 				"suitabl",
 				{
-					"_index": 532,
+					"_index": 531,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -13043,7 +13032,7 @@
 			[
 				"throughput",
 				{
-					"_index": 530,
+					"_index": 529,
 					"title": {},
 					"module": {},
 					"group": {},
@@ -13661,7 +13650,7 @@
 			[
 				"workload",
 				{
-					"_index": 540,
+					"_index": 539,
 					"title": {},
 					"module": {},
 					"group": {},
