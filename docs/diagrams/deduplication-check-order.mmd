@@ -1,0 +1,10 @@
+flowchart TD
+	A["New metadata"] --> B{GUID match?}
+	B -->|No| C["ERROR: GUID mismatch"]
+	B -->|Yes| D{Length match?}
+	D -->|No| E["Record changed -- write"]
+	D -->|Yes| F{QHash match?}
+	F -->|No| G["Record changed -- write"]
+	F -->|Yes| H{MD5 match?}
+	H -->|No| I["Record changed -- write"]
+	H -->|Yes| J["Identical -- skip write"]

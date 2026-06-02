@@ -1,0 +1,21 @@
+flowchart TD
+	A["write(hash, guid, record, cb)"] --> B["read existing record"]
+	B --> C["Merge: { ...existing, ...new }"]
+	C --> D["JSON.stringify merged record"]
+	D --> E["generateMetadataForRecord()"]
+	E --> F{Metadata check enabled?}
+	F -->|Yes| G["readRecordMetadata()"]
+	G --> H{Content changed?}
+	H -->|No - same hash| I["Skip write"]
+	H -->|Yes - different| J["Continue"]
+	F -->|No| J
+	J --> K{Delta tracking enabled?}
+	K -->|Yes| L["diffRecords + generateDelta"]
+	L --> M["writeRecordDelta()"]
+	K -->|No| N["Skip delta"]
+	M --> O["persistRecordMetadata()"]
+	N --> O
+	O --> P["persistRecord()"]
+	P --> Q["stampRecordTimestamp()"]
+	Q --> R["callback()"]
+	I --> R

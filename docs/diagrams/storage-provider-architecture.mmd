@@ -1,0 +1,18 @@
+graph TB
+	subgraph "Bibliograph Core"
+		BSB["BibliographStorageBase<br/>(write/delete logic, metadata, deltas)"]
+	end
+	subgraph "Built-in"
+		BSFS["BibliographStorageFS<br/>(JSON files on disk)"]
+	end
+	subgraph "External Providers"
+		BSM["bibliograph-storage-meadow<br/>(SQLite, MySQL, PostgreSQL, MSSQL)"]
+		BSL["bibliograph-storage-lmdb"]
+		BSLDB["bibliograph-storage-leveldb"]
+		BSR["bibliograph-storage-rocksdb"]
+	end
+	BSB --> BSFS
+	BSB --> BSM
+	BSB --> BSL
+	BSB --> BSLDB
+	BSB --> BSR

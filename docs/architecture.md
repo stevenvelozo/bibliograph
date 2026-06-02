@@ -4,17 +4,8 @@ Bibliograph is structured as a set of Pict services organized into three layers:
 
 ## Service Hierarchy
 
-```mermaid
-graph TB
-	subgraph Pict Instance
-		BIB["Bibliograph<br/>(BibliographService)"]
-		STORE["BibliographStorage<br/>(BibliographStorageFS or custom)"]
-		DIFF["BibliographRecordDiff<br/>(BibliographRecordDiff)"]
-	end
-	BIB -->|"delegates storage"| STORE
-	BIB -->|"auto-provisions"| DIFF
-	STORE -->|"extends"| BASE["BibliographStorageBase"]
-```
+<!-- bespoke diagram: edit diagrams/service-hierarchy.mmd or .hints.json, then: npx pict-renderer-graph build modules/meadow/bibliograph/docs -->
+![Service Hierarchy](diagrams/service-hierarchy.svg)
 
 All three services are registered on the Pict instance and are accessible as `_Pict.Bibliograph`, `_Pict.BibliographStorage`, and `_Pict.BibliographRecordDiff`.
 
@@ -91,43 +82,13 @@ When instantiated, it checks whether `BibliographStorage` and `BibliographRecord
 
 The write operation is the most complex flow in Bibliograph. It handles merging, deduplication, metadata, and delta tracking:
 
-```mermaid
-flowchart TD
-	A["write(hash, guid, record, cb)"] --> B["read existing record"]
-	B --> C["Merge: { ...existing, ...new }"]
-	C --> D["JSON.stringify merged record"]
-	D --> E["generateMetadataForRecord()"]
-	E --> F{Metadata check enabled?}
-	F -->|Yes| G["readRecordMetadata()"]
-	G --> H{Content changed?}
-	H -->|No - same hash| I["Skip write"]
-	H -->|Yes - different| J["Continue"]
-	F -->|No| J
-	J --> K{Delta tracking enabled?}
-	K -->|Yes| L["diffRecords + generateDelta"]
-	L --> M["writeRecordDelta()"]
-	K -->|No| N["Skip delta"]
-	M --> O["persistRecordMetadata()"]
-	N --> O
-	O --> P["persistRecord()"]
-	P --> Q["stampRecordTimestamp()"]
-	Q --> R["callback()"]
-	I --> R
-```
+<!-- bespoke diagram: edit diagrams/write-flow.mmd or .hints.json, then: npx pict-renderer-graph build modules/meadow/bibliograph/docs -->
+![Write Flow](diagrams/write-flow.svg)
 
 ## Delete Flow
 
-```mermaid
-flowchart TD
-	A["delete(hash, guid, cb)"] --> B["readRecordMetadata()"]
-	B --> C{Metadata exists?}
-	C -->|Yes| D["Set metadata.Deleted = timestamp"]
-	D --> E["persistRecordMetadata()"]
-	C -->|No| F["Generate stub metadata"]
-	E --> G["persistDelete()"]
-	F --> G
-	G --> H["callback()"]
-```
+<!-- bespoke diagram: edit diagrams/delete-flow.mmd or .hints.json, then: npx pict-renderer-graph build modules/meadow/bibliograph/docs -->
+![Delete Flow](diagrams/delete-flow.svg)
 
 ## Storage Provider
 
@@ -151,26 +112,8 @@ This logic lives in the base class so all storage providers share the same dedup
 
 ## Storage Provider Architecture
 
-```mermaid
-graph TB
-	subgraph "Bibliograph Core"
-		BSB["BibliographStorageBase<br/>(write/delete logic, metadata, deltas)"]
-	end
-	subgraph "Built-in"
-		BSFS["BibliographStorageFS<br/>(JSON files on disk)"]
-	end
-	subgraph "External Providers"
-		BSM["bibliograph-storage-meadow<br/>(SQLite, MySQL, PostgreSQL, MSSQL)"]
-		BSL["bibliograph-storage-lmdb"]
-		BSLDB["bibliograph-storage-leveldb"]
-		BSR["bibliograph-storage-rocksdb"]
-	end
-	BSB --> BSFS
-	BSB --> BSM
-	BSB --> BSL
-	BSB --> BSLDB
-	BSB --> BSR
-```
+<!-- bespoke diagram: edit diagrams/storage-provider-architecture.mmd or .hints.json, then: npx pict-renderer-graph build modules/meadow/bibliograph/docs -->
+![Storage Provider Architecture](diagrams/storage-provider-architecture.svg)
 
 ## File System Layout
 
@@ -190,16 +133,8 @@ Each source gets its own folder with three subfolders for the three types of dat
 
 **BibliographRecordDiff** (`source/services/record/Bibliograph-Record-Diff.js`) compares two JSON record objects and identifies which fields differ.
 
-```mermaid
-flowchart LR
-	A["Old Record"] --> D["diffRecords()"]
-	B["New Record"] --> D
-	D --> E{Match?}
-	E -->|"M: 1"| F["No changes"]
-	E -->|"M: 0"| G["V: changed field names"]
-	G --> H["generateDiffDelta()"]
-	H --> I["Delta object with new values"]
-```
+<!-- bespoke diagram: edit diagrams/record-diff-service.mmd or .hints.json, then: npx pict-renderer-graph build modules/meadow/bibliograph/docs -->
+![Record Diff Service](diagrams/record-diff-service.svg)
 
 The diff result uses a compressed format optimized for storage at scale:
 
@@ -240,18 +175,8 @@ The deduplication check compares Length, then QHash, then MD5 -- stopping early 
 
 ## Deduplication Check Order
 
-```mermaid
-flowchart TD
-	A["New metadata"] --> B{GUID match?}
-	B -->|No| C["ERROR: GUID mismatch"]
-	B -->|Yes| D{Length match?}
-	D -->|No| E["Record changed -- write"]
-	D -->|Yes| F{QHash match?}
-	F -->|No| G["Record changed -- write"]
-	F -->|Yes| H{MD5 match?}
-	H -->|No| I["Record changed -- write"]
-	H -->|Yes| J["Identical -- skip write"]
-```
+<!-- bespoke diagram: edit diagrams/deduplication-check-order.mmd or .hints.json, then: npx pict-renderer-graph build modules/meadow/bibliograph/docs -->
+![Deduplication Check Order](diagrams/deduplication-check-order.svg)
 
 ## Delta Container Structure
 

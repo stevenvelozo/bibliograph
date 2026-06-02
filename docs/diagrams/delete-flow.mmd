@@ -1,0 +1,9 @@
+flowchart TD
+	A["delete(hash, guid, cb)"] --> B["readRecordMetadata()"]
+	B --> C{Metadata exists?}
+	C -->|Yes| D["Set metadata.Deleted = timestamp"]
+	D --> E["persistRecordMetadata()"]
+	C -->|No| F["Generate stub metadata"]
+	E --> G["persistDelete()"]
+	F --> G
+	G --> H["callback()"]

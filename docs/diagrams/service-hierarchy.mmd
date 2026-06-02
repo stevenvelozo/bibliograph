@@ -1,0 +1,9 @@
+graph TB
+	subgraph Pict Instance
+		BIB["Bibliograph<br/>(BibliographService)"]
+		STORE["BibliographStorage<br/>(BibliographStorageFS or custom)"]
+		DIFF["BibliographRecordDiff<br/>(BibliographRecordDiff)"]
+	end
+	BIB -->|"delegates storage"| STORE
+	BIB -->|"auto-provisions"| DIFF
+	STORE -->|"extends"| BASE["BibliographStorageBase"]
